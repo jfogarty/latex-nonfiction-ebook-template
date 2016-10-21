@@ -1,5 +1,5 @@
-Latex Technical Nonfiction Book
-===============================
+LaTeX Nonfiction Book/eBook Template
+====================================
 
 This is a template for creating the various formats of a technical non-fiction
 book using content written in LaTeX. Modern books need to be formatted for
@@ -449,102 +449,16 @@ complete LaTeX environment, which includes `pdflatex`. This project was
 developed on **Linux Mint**. All of the required tools are available for
 both **Windows** and Mac **OS X**, but I have not tested it on those platforms.
 Some fiddling will no doubt be required. This section describes the tools
-that you need on your system and how to get them.
+that you need on your system and how to get them. You will need:
 
-## Prerequisite tools
+- A Bash command line shell
+- LaTeX TexLive 2016
+- TeXstudio LaTeX editor
+- Calibre eBook Manager
+- ePubCheck
+- Pinta Graphics Editor
 
-These tools expect a **bash** commmand line environment as found on most
-Linux distributions. Windows and Mac users will may need to do additional
-configuration for these.
-
-**perl**, **java**, **sed**, **stat**, **mkdir**, **rm**, **cp** 
-must all be available from the command line and work as expected.
-
-#### LaTeX TexLive 2016
-
- I **strongly** recommend
-that you install [TexLive 2016](https://www.tug.org/texlive/doc/texlive-en/texlive-en.html).
-Almost all of the tools required by this project are already part of the 
-TexLive 2016 distribution. If you try to use ad-hoc versions of LaTeX 
-and packages, you will spend a very long time debugging your builds.
-
-#### TeXstudio LaTeX editor
-
-I use [TeXstudio](http://www.texstudio.org/) for interactive editing of all my LaTeX files.
-
-#### Calibre eBook Manager
-
-This is the essential tool for editing and managing eBooks. It lets you load
-the book, edit metadata and content, and set up a server for connecting to
-eReaders such as iPads, iPhones, Kindles, etc. to download books.
-
-Get if from [Calibre download](http://calibre-ebook.com/download)
-
-#### ePubCheck
-
-You must create fully validated .epub files before attempting to publish
-them. This means you must run ePubCheck since it is the same tool the pubisher
-will run before accepting your book. *ePubCheck* is a java tool. 
-
-The `./bin/epubcheck` script expects that the jar file for epubcheck is
-already located at **$HOME/LaTeX/epubcheck/target/epubcheck.jar**. If you
-don't have it, then you can get it via:
-
-```
-    git clone https://github.com/IDPF/epubcheck.git
-    cd epubcheck
-    mvn install    
-```
-Make sure to read its README.md file, since this also requires it own set 
-of tools such as Maven.
-
-
-#### Undefined control sequence - pgfsys@svg@newline -- Hnewline.fix
-
-When building html, epub, and mobi files, you may encounter a **lot** of
-error messages in during the tex4ht conversion. The log file will contain
-messages that look like:
-
-```
-	! Undefined control sequence.
-	\pgfsys@svg@newline ->\Hnewline 
-``` 
-
-To fix these I edited my
-**/usr/local/texlive/2016/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-tex4ht.def** file. 
-At Line 83 in pgfsys-tex4ht.def I changed
-
-```
-	\def\pgfsys@svg@newline{\Hnewline}
-```
-to
-```
-	% --- jfogarty 8sep2016 Patch for tex4ht
-	%\def\pgfsys@svg@newline{\Hnewline}% FROM https://bugzilla.redhat.com/attachment.cgi?id=978709
-	\def\pgfsys@svg@newline{{?nl}}
-```
-Which fixed the huge number of undefined control sequence messages.
-
-#### [Improving Poor Resolution Equations](http://tex.stackexchange.com/questions/43772/latex-xhtml-with-tex4ht-bad-quality-images-of-equations) in EPub Files/HTML
-
-The **tex4ht** program by default converts equations into .png image files,
-but at a fairly low resolution. Find your version of tex4ht with:
-
-```
-which tex4ht
-```
-
-on my system this is `/usr/local/texlive/2016/bin/x86_64-linux/tex4ht`.
-The configuration file is called `tex4ht.env` which is in 
-`/usr/local/texlive/2016/texmf-dist/tex4ht/base/unix` for my system.
-There is also a `win32` version.  
-
-Follow [these instructions](http://tex.stackexchange.com/questions/43772/latex-xhtml-with-tex4ht-bad-quality-images-of-equations) as needed for your system.
-
-I used `dvipng` at a higher resolution which is part of the linux TeXlive
-distribution.
-
-
+[Installation Notes are found here (INSTALL.md).](INSTALL.md)
 
 # License
 
