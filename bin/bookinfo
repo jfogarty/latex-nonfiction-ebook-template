@@ -1,0 +1,325 @@
+#!/bin/bash
+# Display the parameters for a specific LaTeX book.
+# ----------------------------------------------------------------------------
+# LaTeX eBook utility tools
+# -----------------------------------------------------------------------------
+# John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
+# -----------------------------------------------------------------------------
+declare fullScriptName=$_
+declare scriptName=$(basename $0)
+
+declare bookName
+declare parametersName
+
+declare trialRun=0
+declare verbose=0
+declare quiet=0
+declare argv
+declare rv
+
+#------------------------------------------------------------------------
+# Terminate the script with a failure message.
+
+# echo text if not quiet
+function qecho()
+{
+    if [[ $quiet -eq 0 ]]; then
+        echo "$@"
+    fi
+}
+
+# echo text if in verbose mode.
+function vecho()
+{
+    if [[ $verbose -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
+function fail()
+{
+    local msg=$1
+    qecho "[$scriptName] *** Failed: $msg"
+    exit 666
+}
+
+function requireFile()
+{
+	local fileType=$1
+	local fileName=$2
+    if [[ ! -e "$fileName" ]]; then
+        fail "$fileType input file '$fileName' does not exist"
+    fi
+}
+
+function checkDir()
+{
+	local dirName=$1
+	local fileName=$2
+    if [[ -e "$dirName" ]]; then
+        local toFile="$dirName/$fileName"
+        if ! [[ -e "$toFile" ]]; then
+            qecho "*** Suspicious target directory. Clear it yourself first."
+            fail "$toFile should exist."
+        fi
+    fi
+}
+
+#------------------------------------------------------------------------
+# Checks to see if a directory is the same as another.
+# return 0 (success) if the directories are the same
+function dirMatches
+{
+    local dir1=$1
+    local dir2=$2
+    if [[ -e "$dir1" ]] && [[ -e "$dir2" ]]; then
+        [[ "$(stat -c "%d:%i" $dir1)" == "$(stat -c "%d:%i" $dir2)" ]] && return 0
+    fi
+    return 1
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function runIgnore()
+{
+    if [[ $trialRun -ne 0 ]]; then
+        qecho "--Run:[$@]"
+    else
+       vecho "- $@"
+       echo "$@" >> $rebuildScript
+       eval "$@"
+    fi
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function run()
+{
+    runIgnore "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        qecho "[$scriptName] *** Error with [$1]" >&2
+        exit $status
+    fi
+    return $status
+}
+
+#------------------------------------------------------------------------
+# Remove a specified extension from a filename if its present.
+# Return resulting file in rv.
+function removeExtension()
+{
+    local fileName=$1
+    local extName=$2
+    if [[ "${fileName%.*}.$extName" == "$fileName" ]]; then
+        fileName=${fileName%.*}
+    fi
+    if [[ "${fileName:(-1)}" == "." ]]; then
+        fileName=${fileName%.*}
+    fi    
+    rv="$fileName"
+}
+
+#------------------------------------------------------------------------
+# Strip : and = from argument text
+function dirArg()
+{
+    local dirName=$1
+    if [[ ${dirName:0:1} == ":" ]] ; then
+        dirName=${dirName:1}
+    fi
+    if [[ "${dirName:0:1}" == "=" ]] ; then
+        dirName=${dirName:1}
+    fi
+    rv="$dirName"
+}
+
+#------------------------------------------------------------------------
+# Copy files to the target directory conversion (after clearing it)
+function copyIfExists()
+{
+    local theFile=$1
+    local theDest=$2
+    if [[ -e "$theFile" ]]; then
+        run "cp \"$theFile\" \"$theDest\""
+    fi
+}
+
+# Modify the book.tex by setting a \Boolean parameter to a specific value.
+function doSetBookBoolean()
+{
+    local texFile="$1"
+    local paramName="$2"
+    local boolValue="$3"
+    local theValue="false"
+    if [[ $boolValue -eq 1 ]]; then
+        theValue="true"
+    fi
+    run "setBookBoolean \"$texFile\" $paramName $theValue"
+}
+
+#------------------------------------------------------------------------
+function evalrv()
+{
+    #rv=`$cmd`  # Odd perl issues. Output to tmp file instead.
+    eval $1 > x.tmp 
+    rv=`cat x.tmp`
+    rm x.tmp
+}
+
+function getBookParam()
+{
+    local pname=$1
+    local cmd='perl -0ne '"'"'print "$1\n" if /\\'"$pname"'{(.*)}/g'
+    local cmd+="' < $parametersName.tex"
+    #echo "-----------[$cmd]" 
+    evalrv "$cmd"
+}
+
+function getTexParam()
+{
+    #perl -0ne '"print "[$1]\n" if /\\Boolean{RAWHTML}\s*{(.*)}/g' eBook.tex
+    local pname=$1
+    local cmd='perl -0ne '"'"'print "$1\n" if /\\Boolean{'"$pname"'}\s*{(.*)}/g'
+    local cmd+="' < $bookName.tex"
+    #echo "-----------[$cmd]" 
+    evalrv "$cmd"
+}
+
+function showBookInfo()
+{
+
+    local -a bookParams=(
+        "TheMainTitle"
+        "TheSubTitle"
+        "TheBookSeries"
+        "TheAuthor"
+        "TheAuthorLNF"
+        "PrintISBN"
+        "PrintISBNShort"
+        "EbookISBN"
+        "EbookISBNShort"
+        "TheCopyrightYear"
+        "TheEdition"
+        "TheLCCN"
+        "TheDDSN"
+        "TheLCPCN"
+        "ThePublisherName"
+        "ThePublisherAddrA"
+        "ThePublisherAddrB"
+        "ThePrinter"
+        "TheSubjectArea"
+    )
+
+    for e in "${bookParams[@]}"; do
+        getBookParam "$e"
+        printf 'Parameter: %20s : %-6s\n' "$e" "$rv"
+        t=0
+    done    
+
+    if [[ -n "$bookName" ]]; then
+        printf '\n'
+        local -a texParams=(
+            "ISBOOK"      "This is formatted as a book"
+            "FINALFORM"   "Ready for publication"
+            "EDITMODE"    "Editing mode (double spaced)"
+            "WATERMARK"   "Place a watermark on the text (SLOW)"
+            "TOHTML"      "Format for Tex4HT conversion"
+            "TOMOBI"      "Extra Formatting for Kindle .MOBI"
+            "TOEPUB"      "Extra Formatting for IDPF .EPUB"
+            "RAWHTML"     "Allow /HCode directly in text [no PDF]"
+            "TOPRESS"     "Format for paper printing" 
+            "NOCOLOR"     "Format for monochrome output"
+            "NOBODY"      "Incude only the intro [debugging]"
+            "NOLISTS"     "Do not generate lists of figures and tables"
+            "NOFIGLIST"   "Do not generate list of tables"
+            "NOTABLIST"   "Do not generate list of figures"
+            "NOINDEX"     "Do not generate index entries"
+            "NOAUTHORS"   "Do not include the Authors section"
+            "NOHYPERREF"  "Disables hyperref - href linking"
+            "SUBCAPTIONS" "Allow subcaptioned figures"
+            "NOABBR"      "Suppress abbreviations"
+        )
+        local t=0
+        for e in "${texParams[@]}"; do
+            if [[ $t -eq 0 ]]; then
+                p="$e"
+                t=1
+            else
+                getTexParam "$p"
+                printf 'Format %11s : %-6s  %s\n' "$p" "$rv" "$e"
+                t=0
+            fi
+        done
+    fi
+
+    getBookParam "TotalPageCount"; local pages="$rv"
+    getBookParam "PaperWidthPt";   local width="$rv"
+    getBookParam "PaperHeightPt";  local height="$rv"
+
+    printf '\nBook Format %s x %s (%s pages)\n\n' $width $height $pages 
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function scriptUsage()
+{
+    echo "Usage: $scriptName [options] [bookname]"
+    echo "Display parameters and boolean values about a book.tex file."
+    echo ""
+    echo "Options:"
+    echo "  -v             verbose output during command execution."
+    echo "  -q             quiet mode. Disables all console output."
+    echo "  -t             trial run -- commands are shown but not executed."
+    echo ""
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function main()
+{
+    local
+    if [[ -n "$1" ]]; then
+        removeExtension "$1" "tex"; bookName="$rv"
+        requireFile "LaTex"  "$bookName.tex"        
+    else
+        if [[ -e "book.tex" ]]; then
+            bookName="book"
+        else
+            if [[ -e "eBook.tex" ]]; then
+                bookName="eBook"
+            fi
+        fi
+    fi
+
+    requireFile "Parameters"  "$parametersName.tex"
+    showBookInfo
+    exit 0
+}
+
+#------------------------------------------------------------------------
+# Script entry point.
+
+argv="$1"
+parametersName="BookParameters"
+bookName=""
+
+OPTIND=1 # Reset in case getopts has been used previously in the shell.
+while getopts "h?vqt" opt; do
+    case "$opt" in
+        h|\?)
+            scriptUsage
+            exit 0
+            ;;
+        v)  verbose=1
+            ;;
+        q)  quiet=1
+            ;;
+        t)  trialRun=1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+main "$@"
+# - End of bash script.

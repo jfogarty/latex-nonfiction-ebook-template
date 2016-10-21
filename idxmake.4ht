@@ -1,0 +1,168 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% idxmake.4ht                          2009-05-21-09:32 %
+% Copyright (C) 2000--2009      Eitan M. Gurari         %
+%                                                        %
+% This work may be distributed and/or modified under the %
+% conditions of the LaTeX Project Public License, either %
+% version 1.3c of this license or (at your option) any   %
+% later version. The latest version of this license is   %
+% in                                                     %
+%   http://www.latex-project.org/lppl.txt                %
+% and version 1.3c or later is part of all distributions %
+% of LaTeX version 2005/12/01 or later.                  %
+%                                                        %
+% This work has the LPPL maintenance status "maintained".%
+%                                                        %
+% This Current Maintainer of this work                   %
+% is Eitan M. Gurari.                                    %
+%                                                        %
+% If you modify this program your changing its signature %
+% with a directive of the following form will be         %
+% appreciated.                                           %
+%            \message{signature}                         %
+%                                                        %
+%                             gurari@cse.ohio-state.edu  %
+%                 http://www.cse.ohio-state.edu/~gurari  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\immediate\write-1{version 2009-05-21-09:32}
+
+
+\def\SourceInd#1#2#3#4{#1.#2}
+\def\MakefileInd#1#2#3#4{#1.#4}
+
+\newcount\cnt
+\newtoks\split
+
+\def\noXcatcodes{%
+   \cnt=0
+   \def\noXXcatcodes{%
+      \catcode\cnt12
+      \ifnum\cnt<255
+          \advance\cnt  1  \expandafter\noXXcatcodes
+      \fi }%
+   \noXXcatcodes }
+
+\newwrite\idx
+\newwrite\indexes
+\def\MakefileIn#1#2#3#4{#1.#3}
+\def\MakefileIndexes#1#2#3#4{#1.4ix}
+\immediate\openout\idx=\expandafter\MakefileIn\filename\relax
+\immediate\openout\indexes=\expandafter\MakefileIndexes\filename\relax
+
+\def\beforeentry#1#2#3#4{
+   \def\file{#1}\def\anchor{#2}\def\pointer{#3}\def\indexentry{\string#4}
+   \begingroup   \noXcatcodes
+     \catcode`\s=11 \catcode`\e=11 `%for \see`%
+     \catcode`\^^M=10    \catcode`\ =10    \catcode`\^^I=10
+     \catcode`\{=1 \catcode`\}=2 \futurelet\next\preGetentries
+}
+\def\bparent#1|(#2!*?: {\def\core{#1}\def\parent{#2}}
+\def\eparent#1|)#2!*?: {\def\core{#1}\def\parent{#2}}
+\def\see#1|see#2|see#3!*?: {\def\preSee{#1}\def\isSee{#2}}
+\newcount\entryNum
+\def\preGetentries{\ifx [\next \expandafter\opGetentries
+  \else \global\split={}\expandafter\getentries\fi}
+\def\opGetentries[#1]{\global\split={[#1]}\getentries}
+
+\def\getentries#1#2{\endgroup
+   \advance\entryNum by 1
+   \let\parent=\empty
+   \bparent#1|(!*?: \ifx \parent\empty
+      \eparent#1|)!*?: \ifx \parent\empty
+        \see#1|see|see!*?: %
+\ifx \isSee\empty
+   \hasBar#1|!*?: {#1}{#2}%
+\else
+   \immediate\write\idx{\indexentry\the\split{%
+     \preSee|see{\string\LNK{\file}{\anchor}{\isSee}{}}}{\the\entryNum
+}}%
+   \immediate\write\indexes{\string \indexmark\the\split{%
+     \preSee}{\the\entryNum
+}}%
+\fi
+%
+      \else
+        \immediate\write\idx{\indexentry\the\split{%
+          \core|LNK\csname \core|(\endcsname
+          --\string\LNK{\file}{\anchor}{\pointer}}{\the\entryNum
+}}%
+        \immediate\write\indexes{\string \indexmark\the\split{%
+          \core}{\the\entryNum
+}}%
+      \fi
+   \else
+      \expandafter\edef\csname \core|(\endcsname
+          {{\file}{\anchor}{\pointer}{\the\entryNum
+}}%
+   \fi
+}
+\def\hasBar#1|#2!*?: #3#4{%
+   \def\temp{#2}\ifx \temp\empty
+      \immediate\write\idx{\indexentry\the\split{%
+         #3|LNK{\file}{\anchor}{\pointer}}{\the\entryNum
+}}%
+      \immediate\write\indexes{\string \indexmark\the\split{%
+         #3}{\the\entryNum
+}}%
+   \else \yeshasBar#3!*?: {\the\entryNum
+}\fi
+}
+\def\yeshasBar#1|#2!*?: #3{%
+   \immediate\write\idx{\indexentry\the\split{%
+       #1|yhbLNK{#2}{\file}{\anchor}{\pointer}}{\the\entryNum
+}}%
+   \immediate\write\indexes{\string \indexmark\the\split{%
+       #2}{\the\entryNum
+}}%
+}
+
+\newcount\GetentriesN
+\GetentriesN=0
+\def\indexentry{\string\indexentry}
+\def\Ganchor{\ifnum \GetentriesN<10 0\fi
+  \ifnum \GetentriesN<100 0\fi
+  \ifnum \GetentriesN<1000 0\fi
+  \the\GetentriesN}
+\def\Beforeentry{\let\getentries=\Getentries
+   \let\Beforeentry=\beforeentry \Beforeentry}
+\def\Getentries#1#2{\endgroup
+   \advance\GetentriesN by 1
+   \let\parent=\empty
+   \bparent#1|(!*?: \ifx \parent\empty
+      \eparent#1|)!*?: \ifx \parent\empty
+        \see#1|see|see!*?: %
+        \ifx \isSee\empty \immediate\write\idx{\indexentry\the\split{%
+           \string\indNum{\Ganchor}%
+%
+   #1\string\indNum{\Ganchor}%
+\string\comNum}{#2}}%
+%
+        \else             \immediate\write\idx{\indexentry\the\split{%
+   {\Ganchor}%
+   \preSee\string\gobble|see{\isSee}}{#2}}%
+\fi
+      \else
+        \immediate\write\idx{\indexentry\the\split{%
+           \string\indNum{\Ganchor}%
+\string\erange{\csname \core|(\endcsname}
+           \core\string\indNum{\Ganchor}%
+\string\comNum}{#2}}%
+      \fi
+   \else
+        \immediate\write\idx{\indexentry\the\split{%
+           \string\indNum{\Ganchor}%
+\string\brange{\Ganchor}
+           \core\string\indNum{\Ganchor}%
+\string\comNum}{#2}}%
+        \expandafter\edef\csname \core|(\endcsname{\Ganchor}%
+   \fi
+}
+
+\input \expandafter\SourceInd\filename\relax
+\immediate\closeout\idx
+\immediate\closeout\indexes
+
+
+\bye
+\endinput
+

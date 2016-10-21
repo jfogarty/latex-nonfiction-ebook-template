@@ -1,0 +1,259 @@
+% ----------------------------------------------------------------------------
+% eBook - [Your Book Name Here] - MASTER LaTeX File
+% -----------------------------------------------------------------------------
+% Copyright 2016 [your name] - All rights reserved.
+% 
+% This is the Tex4Ebook version of this work. 
+% It is designed to be formatted into .mobi or .epub versions for
+% distribution to Amazon's Kindle, Apple iBooks, Barnes and Noble NookPress,
+% or other ebook venders.
+%
+% Note: the makebook script should be used to do the actual formatting.
+% The Calibre eBook editor should be run to check the resulting epub for
+% quality. Run the Calibre error checker and edit until clean.
+%
+% After fixing all Calibre detected errors run epubcheck (4.0) to catch
+% additional ones which will still exist. Fix until clean.
+%
+% When epubcheck runs clean use Calibre to convert to .mobi and other formats.
+% -----------------------------------------------------------------------------
+\listfiles
+\documentclass[10pt,oneside]{book}
+
+%% ----------------------------------------------------------------------------
+%% ----- Common Document Information - Common to all Top Level Versions
+\input{BookParameters.tex}
+%% ----------------------------------------------------------------------------
+\usepackage{geometry}
+\geometry{
+  paperwidth=\PaperWidth in,%
+  paperheight=\PaperHeight in,%
+  left=  1.4 in,%
+  right= 0.5 in,%
+  top=   0.5 in,%
+  bottom=0.5 in,%
+}
+
+%\setlength{\stockheight}{\PaperHeight in} % Make hyperref happy.
+
+%\evensidemargin=0.38in  % Pushes left pages to right.
+%\topmargin=-0.8in       % Pushes entire page contents down
+\textwidth=4.5in         % width of actual text area
+
+%\usepackage{showframe}  % Show the layout frame on every page
+\ifdefined\uselayouts
+	\usepackage{layouts}   % Page layout diagram output
+	\printinunitsof{in}    % Show layout units as inches.
+\fi
+
+%% ----------------------------------------------------------------------------
+%% ----- CONTROL PARAMETERS FOR OUTPUT SELECTION -----
+%% The default for producing the article form PDF should be: All options false.
+%% Note: F11, Shift-Alt-F1, F1, F12, F1, F1 (Bibliography, Reauthor, Reindex,
+%%       and PDFLatex twice after changing)
+%% Sometimes all files except .tex and .bib need to be deleted to 
+%% prevent errors. Setting NOINDEX, F1, F12, Unset NOINDEX can help.
+
+\Boolean{ISBOOK}      {true}   % This is formatted as a book
+ 
+\Boolean{FINALFORM}   {false}  % Ready for publication
+\Boolean{EDITMODE}    {no}     % Editing mode (double spaced)
+
+% Warning. Watermarks generate errors, but the doc still builds.
+\Boolean{WATERMARK}   {false}  % Place a watermark on the text (SLOW)
+
+\Boolean{TOHTML}      {true}   % Format for Tex4HT conversion
+\Boolean{TOMOBI}      {true}   % Extra Formatting for Kindle .MOBI
+\Boolean{TOEPUB}      {false}  % Extra Formatting for IDPF .EPUB
+\Boolean{RAWHTML}     {no}     % Allow /HCode directly in text [no PDF]
+
+\Boolean{TOPRESS}     {false}  % Format for paper printing
+\Boolean{NOCOLOR}     {false}  % Format for monochrome output
+
+\Boolean{SUBCAPTIONS} {off}    % Allow subcaptioned figures.
+\Boolean{PARENTIMAGES}{false}  % Images are in a parent directory.
+
+\Boolean{CHAPTERNOTES}{off}    % Place endnotes at end of each chapter
+\Boolean{NOBODY}      {false}  % Incude only the intro [debugging]
+\Boolean{NOLISTS}     {off}    % Do not generate lists of figures and tables
+\Boolean{NOFIGLIST}   {off}    % Do not generate list of tables
+\Boolean{NOTABLIST}   {on}     % Do not generate list of figures
+\Boolean{NOINDEX}     {off}    % Do not generate index entries
+\Boolean{NOAUTHORS}   {off}    % Do not include the Authors section
+\Boolean{NOHYPERREF}  {off}    % Disables hyperref - href linking
+
+\Boolean{NOABBR}      {true}   % Suppress abbreviations section
+\Boolean{NOIMAGES}    {no}     % Disable Graphics inclusion
+
+%% ----------------------------------------------------------------------------
+%% John's COMMON Packages and Command Macros 
+
+\input{tex/zzInit.tex}%                % Document packages and commands
+\usepackage{lipsum}
+%% ----------------------------------------------------------------------------
+
+%\usepackage{showidx}					% Enable index display in margins for checking
+
+\advance\hoffset by -0.7 truein\relax
+
+\def\theaipage{\string\hyperpage{\thepage}} 
+\let\footnote=\endnote                  % Convert all footnotes into endnotes
+\setlength{\columnsep}{5mm}             % Space between two columns
+
+\appto{\theindex}{\spaceskip=.33333em plus .33333em minus .11111em }
+
+% Double spacing when editing
+\ifthenelse{\boolean{FINALFORM}}{}{
+\ifthenelse{\boolean{EDITMODE}}{\linespread{1.6}}{}}
+
+\makeindex% Enable \index commands
+
+%------------------------------------------------------------------------------
+%% Nomenclature and abbreviation commands
+\input{tex/zzAbbr.tex}
+\def\pgfsys@svg@newline{^^J}
+\def\Hnewline{^^J}
+
+%------------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+\begin{document}
+  \frontmatter
+  \pagenumbering{gobble}				% Unnumbered cover page
+  \ifthenelse{\boolean{TOHTML}}{%
+     \IMAGE[width=1.0\textwidth]{eBookCoverPage.jpg}%
+  }{}%
+%------------------------------------------------------------------------------
+% Title Page
+\newlength{\drop}
+\input{tex/zzTitlepage.tex}
+
+%------------------------------------------------------------------------------
+% Copyright Page
+\newpage
+\input{tex/zzCopyright.tex}
+\StopIndent
+
+%------------------------------------------------------------------------------
+% Table of Contents
+\newpage
+\pagenumbering{roman}  % lowercase roman numerals
+\setcounter{page}{3} % Set the page number
+
+% Name the sections as needed
+\renewcommand{\contentsname}{\huge{Contents}}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+
+\pagestyle{plain}
+\tableofcontents
+\newpage
+
+\Indent
+
+%% ----------------------------------------------------------------------------
+%% Preface page(s)
+\clearpage
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\input{tex/preface}
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+%% Chapters
+
+\mainmatter					% book only.
+\pagestyle{headings}
+\clearpage
+\pagenumbering{arabic}  % lowercase arabic numbers
+\setcounter{page}{1} % Set the first page number
+
+\input{tex/introduction}
+\ifthenelse{\boolean{NOBODY}}{}{
+  \input{tex/body}%
+}              
+\ChapterSuffix%
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+\BookEndNotes
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+%% References [Bibliography of /cited works]
+
+%\clearpage  % flush any floating elements
+\backmatter					% book only 
+%\setcounter{page}{499}% Set the page number
+\cleardoublepage\phantomsection%
+\addcontentsline{toc}{chapter}{Bibliography}%
+\bibliography{book}
+
+%\bibliographystyle{apalike}    % Prime Author and year
+\bibliographystyle{plain}       % Just numbers
+%\bibliographystyle{abbrv}      
+%\bibliography{bib,bib_extra}
+%\bibliographystyle{alpha}       % Authors last name first letters, year
+
+%% ----------------------------------------------------------------------------
+%% Cited Authors
+\ifthenelse{\boolean{NOAUTHORS}}{}{%
+  \ifthenelse{\boolean{TOHTML}}{%
+    \renewcommand\indexspace{
+    }%
+  }{}%
+  \cleardoublepage\phantomsection%
+  \chapter*{Authors Cited}
+  \addcontentsline{toc}{chapter}{Authors Cited}%
+  \begin{multicols}{2}%
+	\printauthorindex%
+  \end{multicols}
+}
+
+
+%% ----------------------------------------------------------------------------
+%% Figures and Tables lists\
+\ifthenelse{\boolean{NOLISTS}}{}{%
+  \cleardoublepage\phantomsection%
+  \ifthenelse{\boolean{NOFIGLIST}}{}{%
+    \ifthenelse{\boolean{TOHTML}}{%
+      \addcontentsline{toc}{chapter}{List of Figures}%
+    }{}%  
+    \listoffigures%
+  }
+  \ifthenelse{\boolean{NOTABLIST}}{}{%
+    \ifthenelse{\boolean{TOHTML}}{%
+      \addcontentsline{toc}{chapter}{List of Tables}%
+    }{}%  
+    \listoftables%
+  }
+}
+
+%% ----------------------------------------------------------------------------
+%% Permuted index 
+\ifthenelse{\boolean{NOINDEX}}{}{%
+ %\clearpage%
+  \cleardoublepage\phantomsection%
+% \setcounter{page}{999} % Set the page number
+  \renewcommand{\indexname}{Index}%
+  \addcontentsline{toc}{chapter}{The Index}%
+  \PrintIndex% 
+}%
+
+%% ----------------------------------------------------------------------------
+%% Nomenclature, Terms, Abbreviations, Acronyms, and Glossary 
+\ifthenelse{\boolean{NOABBR}}{}{
+  \cleardoublepage\phantomsection%
+  \addcontentsline{toc}{chapter}{Abbreviations and Terms}
+  \PrintAcronyms%
+}
+%
+%% ----------------------------------------------------------------------------
+%% Page of metrics and diagram about the physical and logical page format.
+\ifdefined\uselayouts
+	\clearpage
+	\currentpage
+	\pagediagram
+	\pagevalues
+\fi
+%
+\end{document}

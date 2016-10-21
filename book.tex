@@ -1,0 +1,256 @@
+%% ----------------------------------------------------------------------------
+%% Paperback Book - [Your Book Name Here] - MASTER LaTeX File
+% -----------------------------------------------------------------------------
+% Copyright 2016 [your name] - All rights reserved.
+% 
+% This is the KOMA-Script LaTeX version of this work. 
+% It is designed to be formatted as either a PDF for direct reading,
+% or as PDF for distribution to a printer as a 6"x9" paperback book.
+%
+% Note: the ./cover subdirectory contains LaTeX for formatting the
+% printed cover. The TotalPageCount of BookParameters.tex must be
+% adjusted before the cover PDFs are generated.
+%
+% Use the ./bin/makebook script to convert the book to PDFs and
+% other formats to avoid leaving out steps.
+% -----------------------------------------------------------------------------
+\documentclass[        % KOMA-Script Book Formatting
+  twoside=true,
+  paper=6in:9in,
+  DIV=calc,
+  BCOR=1.25in,         % Inner gutters width
+  fontsize=10pt,
+  pagesize=pdftex,
+  parskip=half
+]{scrbook}
+
+%% ----------------------------------------------------------------------------
+%% ----- Document Information
+\input{BookParameters.tex}
+
+\evensidemargin=0.38in  % Pushes left pages to right.
+\topmargin=-0.8in      % Pushes entire page contents down
+\textwidth=4.5in       % width of actual text area
+
+\usepackage{scrhack}   % fix \float@addtolists detected! in KOMA scripts.
+
+%\usepackage{showframe}  % Show the layout frame on every page
+\ifdefined\uselayouts
+	\usepackage{layouts}   % Page layout diagram output
+	\printinunitsof{in}    % Show layout units as inches.
+\fi
+
+%% ----------------------------------------------------------------------------
+%% ----- CONTROL PARAMETERS FOR OUTPUT SELECTION -----
+%% The default for producing the article form PDF should be: All options false.
+%% Note: F11, Shift-Alt-F1, F1, F12, F1, F1 (Bibliography, Reauthor, Reindex,
+%%       and PDFLatex twice after changing)
+
+\Boolean{ISBOOK}       {true}   % This is formatted as a book
+ 
+\Boolean{FINALFORM}    {no}     % Ready for publication
+\Boolean{EDITMODE}     {no}     % Editing mode (double spaced)
+
+% Watermarks are NOT applicable to KOMA script books like this one.
+\Boolean{WATERMARK}    {false}  % Not applicable to this version
+
+\Boolean{TOHTML}       {no}     % Format for Tex4HT conversion
+\Boolean{TOMOBI}       {no}     % Extra Formatting for Kindle .MOBI
+\Boolean{TOEPUB}       {no}     % Extra Formatting for IDPF .EPUB
+\Boolean{RAWHTML}      {no}     % Allow /HCode directly in text [no PDF]
+
+\Boolean{TOPRESS}      {true}     % Format for paper printing
+\Boolean{NOCOLOR}      {no}     % Format for monochrome output
+
+\Boolean{SUBCAPTIONS}  {true}   % Allow subcaptioned figures.
+\Boolean{PARENTIMAGES} {no}     % Images are in a parent directory.
+
+\Boolean{CHAPTERNOTES} {no}     % Place endnotes at end of each chapter
+\Boolean{NOBODY}       {no}     % Incude only the intro [debugging]
+\Boolean{NOLISTS}      {no}     % Do not generate lists of figures and tables
+\Boolean{NOFIGLIST}    {no}     % Do not generate list of figures
+\Boolean{NOTABLIST}    {true}   % Do not generate list of tables
+\Boolean{NOINDEX}      {no}     % Do not generate index entries
+\Boolean{NOAUTHORS}    {no}     % Do not include the Authors section.
+\Boolean{NOHYPERREF}   {no}     % Disables hyperref - href linking.
+\Boolean{NOABBR}       {no}     % Suppress abbreviations.
+\Boolean{NOIMAGES}     {no}     % Disable Graphics inclusion
+
+%% ----------------------------------------------------------------------------
+\advance\hoffset by -0.7 truein\relax
+
+\input{tex/zzInit.tex}%                % Document packages and commands
+\usepackage{lipsum}
+%\usepackage{showidx}					% Enable index display in margins for checking
+
+\def\theaipage{\string\hyperpage{\thepage}} 
+\let\footnote=\endnote                  % Convert all footnotes into endnotes
+\setlength{\columnsep}{1cm}             % Space between two columns
+
+\appto{\theindex}{\spaceskip=.33333em plus .33333em minus .11111em }
+
+\ifthenelse{\boolean{EDITMODE}}{\linespread{1.6}}{}
+
+\makeindex								% Enable \index commands
+
+%------------------------------------------------------------------------------
+%% Nomenclature and abbreviation commands
+\input{tex/zzAbbr.tex}
+
+%------------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+\begin{document}
+
+%------------------------------------------------------------------------------
+% Half Title page, followed by Frontispiece / intro quote page
+\frontmatter							% book only
+
+% The pageanchor=false/true around the title pages eliminates an annoying
+% warning: a destination with the same identifier has been already used,
+% duplicate ignored
+\hypersetup{pageanchor=false}
+
+\pagenumbering{gobble}					% Unnumbered cover page
+\newlength{\drop}
+\begin{center}
+  \vspace*{3in}
+  \Huge{\textsf\TheMainTitle}
+\end{center}
+\newpage
+
+\begin{center}
+  \vspace*{2in}
+  \vspace*{1in}
+  \textit{``This is a clever quote or perhaps a dedication.''}
+\end{center}
+
+%------------------------------------------------------------------------------
+% Title Page
+\input{tex/zzTitlepage.tex}
+
+%------------------------------------------------------------------------------
+% Copyright Page
+\newpage
+\input{tex/zzCopyright.tex}
+\StopIndent
+\hypersetup{pageanchor=true}
+
+%------------------------------------------------------------------------------
+% Table of Contents (short vesion, then detailed version)
+\newpage
+\pagenumbering{roman}  % lowercase roman numerals
+\setcounter{page}{3} % Set the page number
+%
+% Name the sections as needed
+%\renewcommand{\contentsname}{\huge{Contents}}%
+\renewcommand*\contentsname{\huge{Detailed Contents}}
+\renewcommand{\listfigurename}{List of Figures}%
+\renewcommand{\listtablename}{List of Tables}%
+%
+\pagestyle{plain}
+\begingroup% Isolate these changes to just the shorttoc command.
+	%\normalsize%
+	\setlength{\parskip}{-2pt}% More negative for tighter spacing.
+	\pdfbookmark[1]{Contents}{toc}%
+	\shorttoc{Summary Contents}{0}% Tighter spacing, Chapter names only.
+\endgroup%
+
+\cleardoublepage
+\tableofcontents
+%
+%% ----------------------------------------------------------------------------
+%% Figures and Tables lists\
+\ifthenelse{\boolean{NOLISTS}}{}{%
+  \cleardoublepage\phantomsection%
+  \ifthenelse{\boolean{NOFIGLIST}}{}{%
+    \addcontentsline{toc}{chapter}{List of Figures}%
+    \listoffigures%
+  }%
+  \ifthenelse{\boolean{NOTABLIST}}{}{%
+    \addcontentsline{toc}{chapter}{List of Tables}%
+    \listoftables%
+  }%
+}%
+%% ----------------------------------------------------------------------------
+%% Preface page(s)
+\Indent
+\clearpage
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\input{tex/preface}
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+%% Chapters
+
+\mainmatter					% book only.
+\pagestyle{headings}
+\clearpage
+\pagenumbering{arabic}  % lowercase arabic numbers
+\setcounter{page}{1} % Set the first page number
+
+\input{tex/introduction}
+\ifthenelse{\boolean{NOBODY}}{}{
+  \input{tex/body}%
+}              
+\ChapterSuffix%
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+\backmatter			
+\BookEndNotes
+
+%% ----------------------------------------------------------------------------
+%% ----------------------------------------------------------------------------
+%% References [Bibliography of /cited works]
+%\setcounter{page}{499}% Set the page number
+\cleardoublepage\phantomsection%
+\addcontentsline{toc}{chapter}{Bibliography}%
+\bibliography{book}%
+
+%\bibliographystyle{apalike}    % Prime Author and year
+\bibliographystyle{plain}       % Just numbers
+
+%% ----------------------------------------------------------------------------
+%% Cited Authors
+\ifthenelse{\boolean{NOAUTHORS}}{}{%
+  \ifthenelse{\boolean{TOHTML}}{%
+    \renewcommand\indexspace{
+    }%
+  }{}%
+  \cleardoublepage\phantomsection%
+  \chapter*{Authors Cited}%
+  \addcontentsline{toc}{chapter}{Authors Cited}%
+  \begin{multicols}{2}%
+	\printauthorindex%
+  \end{multicols}%
+}%
+%
+%% ----------------------------------------------------------------------------
+%% Permuted index 
+\ifthenelse{\boolean{NOINDEX}}{}{%
+  \cleardoublepage\phantomsection%
+  % \setcounter{page}{999} % Set the page number [debugging]
+  \renewcommand{\indexname}{Index}%
+  \addcontentsline{toc}{chapter}{The Index}%
+  \PrintIndex% 
+}%
+%
+%% ----------------------------------------------------------------------------
+%% Nomenclature, Terms, Abbreviations, Acronyms, and Glossary 
+\ifthenelse{\boolean{NOABBR}}{}{
+  \cleardoublepage\phantomsection%
+  \addcontentsline{toc}{chapter}{Abbreviations and Terms}
+  \PrintAcronyms%
+}%
+%
+%% ----------------------------------------------------------------------------
+%% Page of metrics and diagram about the physical and logical page format.
+\ifdefined\uselayouts
+	\clearpage
+	\currentpage
+	\pagediagram
+	\pagevalues
+\fi
+
+\end{document}

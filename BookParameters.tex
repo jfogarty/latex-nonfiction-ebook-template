@@ -1,0 +1,137 @@
+%% ----------------------------------------------------------------------------
+%% Book Parameters - Included in body and cover
+%% ----------------------------------------------------------------------------
+\usepackage{tikz}% Plotting and formatting
+\usepackage{pgf}% Fancy math
+\usepackage{xifthen}% add ifthenelse and condtionals
+
+%\def\uselayouts{}% Enable to display page layout info at end of document.
+
+% At 215 pages, the spine is wide enough to hold a publishers logo
+% and a nice sized title. At 315 pages the spine can hold a subtitle.
+% The logo is not available below 215 pages, and below 150 pages the
+% title size is very reduced. A blank spine is used when the book has
+% fewer than 123 pages.
+\pgfmathsetmacro\TotalPageCount{31}% Must be manually entered
+\pgfmathsetmacro\PaperWidthPt{6in}%
+\pgfmathsetmacro\PaperHeightPt{9in}%
+
+%\def\ShowCoverStatistics{}% Enable to show some numbers on back cover.
+
+\def\TheMainTitle{The Ultimate Book}
+\def\TheSubTitle{Hey! Why Not Read This One?}
+\def\TheBookSeries{Books That Are Really Odd Series}
+
+\def\TheAuthor{Wilson J. Schmeggles}
+\def\TheAuthorLNF{Schmeggles, Wilson, J.}
+
+
+\def\TheCopyrightYear{2017}
+\def\TheEdition{First Edition}
+
+\def\ThePublisherName{Your Press}% Just the short form name
+\def\ThePublisherLineA{Your}% Just one part of the name
+\def\ThePublisherLineB{Press}% Just one part of the name
+\def\ThePublisher{\ThePublisherName}% Add Ltd, Inc, LLC etc here
+\def\ThePublisherAddrA{1234 Xyzzy Plugh Ln}
+\def\ThePublisherAddrB{North Wyodaka, QM 45678}
+\def\ThePublisherCity{Wyodaka}
+\def\ThePublisherState{QM}
+
+\def\ThePrinter{CreateSpace, An Amazon.com Company}
+
+\def\TheSubjectArea{Yada, Yada, Yada}
+
+\def\TheKeywords{Yadas, Books, Odd, Wierd}
+
+%% ----------------------------------------------------------------------------
+% NOTE Each version of a book usually requires its own ISBN. You can
+% obtain blocks of 10 ISBNs for $250 from https://www.myidentifiers.com/
+% You must know you Imprint Name (publisher). 
+\def\PrintISBN{978-4444444446}% 
+\def\PrintISBNShort{4444444449}%
+\def\EbookISBN{978-5555555557}%
+\def\EbookISBNShort{5555555559}%
+
+%% ----------------------------------------------------------------------------
+% NOTE that the following are not valid until acquired from either
+% a publisher or the Library of Congress. Self-publishers should
+% contact http://www.quality-books.com/pcip.htm
+% The LCCN usually costs $100 and cannot be obtained until most of
+% a first draft is available as a text file.
+% Library of Congress Catalog Subject Headings
+\def\TheCIPSubjectHeadings{1. Get from QualityBooks}
+
+% Library of Congress classification number (also Control Number)
+\def\TheLCCN{QP333.K33 2017}
+
+% Dewey Decimal System classification number
+\def\TheDDSN{333.33-dc33}
+
+% Library of Congress’ Preassigned Control Number (PCN)
+\def\TheLCPCN{2017xxxxxx}
+
+%% ----------------------------------------------------------------------------
+\def\TheCopyrightKeywords{1. Artificial intelligence; 2. Cognitive neuroscience}
+
+\def\ShortDescription{% Normally restricted to 300 t0 350 characters depending on publisher.
+\textsf{\textbf{World War II and the Manhattan Project} -- a group of Hungarian scientists that included émigré physicist Leó Szilárd attempted to alert Washington.}}
+
+\def\BackDescription{% Typically max 2000-4000 characters
+\textsf{\textbf{World War II and the Manhattan Project} -- a group of Hungarian scientists that included émigré physicist Leó Szilárd attempted to alert Washington to ongoing Nazi atomic bomb research. instein and Szilárd, along with other refugees such as Edward Teller and Eugene Wigner, ``regarded it as their responsibility to alert Americans to the possibility that German scientists might win the race to build an atomic bomb, and to warn that Hitler would be more than willing to resort to such a weapon.'' To make certain the U.S. was aware of the danger, in July 1939, a few months before the beginning of World War II in Europe, Szilárd and Wigner visited Einstein to explain the possibility of atomic bombs, which Einstein, a pacifist, said he had never considered.}}
+
+\def\AuthorBio{% 
+\textsf{\textbf{Wilson J. Schmeggles} was a German-born theoretical physicist. He developed the general theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics). His work is also known for its influence on the philosophy of science. He is best known in popular culture for his rubber–ducky equivalence formula.}}
+
+%% ----------------------------------------------------------------------------
+%% Computed parameters for cover and jacket design 
+
+% CreateSpace and Ingram, use different paper stock so the spine width must
+% be adjusted to refect that.
+% 
+% for White paper: multiply page count by 0.002252
+\pgfmathsetmacro\SinglePageThicknessPt{0.002252in}% Createspace White
+\pgfmathsetmacro\HorBleedPt{0.125in}%
+\pgfmathsetmacro\VerBleedPt{0.125in}%
+\pgfmathsetmacro\FoldVariancePt{0.0625in}%
+
+%% Every book will vary slightly when bound. Allow for 0.0625" variance on either
+%% side of the fold lines for your cover. For example, if your spine width is 1",
+%% your text should be no wider than 0.875". Because of this variance, avoid hard
+%% edges or lines that end on the fold line.
+
+%% Cover Width calculation at 6" x 9" cover with 60 B&W pages on white paper:
+%%    0.125" + 6" + (60 * 0.002252)" + 6" + .125" = 12.385"
+%% Cover Height calculation: 6" x 9": 0.125" + 9" + .125" = 9.25"
+
+\pgfmathsetmacro\SpineWidthPt{\SinglePageThicknessPt*\TotalPageCount}%
+\pgfmathsetmacro\CoverWidthPt{\PaperWidthPt+\HorBleedPt}%
+\pgfmathsetmacro\JacketWidthPt{\CoverWidthPt+\SpineWidthPt+\CoverWidthPt}%
+\pgfmathsetmacro\CoverHeightPt{\VerBleedPt+\PaperHeightPt+\VerBleedPt}%
+
+\pgfmathsetmacro\PtsPerInch{72.27}% Slightly more than 72 - odd.
+
+\pgfmathsetmacro\SpineWidth{\SpineWidthPt    / \PtsPerInch}%
+\pgfmathsetmacro\PaperWidth{\PaperWidthPt    / \PtsPerInch}%
+\pgfmathsetmacro\CoverWidth{\CoverWidthPt    / \PtsPerInch}%
+\pgfmathsetmacro\JacketWidth{\JacketWidthPt  / \PtsPerInch}%
+
+\pgfmathsetmacro\PaperHeight{\PaperHeightPt  / \PtsPerInch}%
+\pgfmathsetmacro\CoverHeight{\CoverHeightPt  / \PtsPerInch}%
+
+\pgfmathsetmacro\HorBleed{\HorBleedPt        / \PtsPerInch}%
+\pgfmathsetmacro\VerBleed{\VerBleedPt        / \PtsPerInch}%
+\pgfmathsetmacro\FoldVariance{\FoldVariancePt/ \PtsPerInch}%
+ 
+%% ----------------------------------------------------------------------------
+\renewcommand{\bf}[1]{\textbf{#1}}% Legacy \bf support.
+
+\newcommand{\SetBool}[2]{%
+  \ifthenelse{\equal{#2}{true}\OR\equal{#2}{on}\OR\equal{#2}{yes}}%
+  {\setboolean{#1}{true}}{\setboolean{#1}{false}}}%
+
+\newcommand{\Boolean}[2]{\newboolean{#1}%
+  \ifthenelse{\isempty{#2}}{}{\SetBool{#1}{#2}}}
+  
+%% End of Book Parameters.
+%% ----------------------------------------------------------------------------

@@ -1,0 +1,38 @@
+%% ----------------------------------------------------------------------------
+%% Nicely formatted title page - Requires BookParameters.tex
+%% ----------------------------------------------------------------------------
+  \begin{titlepage}
+    \drop=0.1\textheight
+    \centering
+    %\vspace*{\baselineskip}
+    \ifthenelse{\boolean{TOHTML}}{}{%
+      \rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt}
+      \rule{\textwidth}{0.4pt}\\[\baselineskip]
+    }%
+    \Huge{\textbf\TheMainTitle}\\%
+    \vspace{-1mm}%
+    \ifthenelse{\boolean{TOHTML}}{}{%
+      \rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt}
+      \rule{\textwidth}{1.6pt}\\%
+    }%
+    \vspace{5mm}
+    \scshape
+      \large\TheSubTitle\par
+    \ifthenelse{\boolean{TOHTML}}{}{%
+      \vspace{5mm}
+      \Image[width=0.8\textwidth]{cover}{png}\par
+    }%
+    \vspace{5mm}
+      {\Large \TheAuthor\par}
+    \ifthenelse{\boolean{FINALFORM}}{%
+      \vspace{10mm}%
+    }{%
+      \FullDraftSpec\\Last Updated: \today\\
+    }
+    \vspace{5mm}
+    {\scshape \TheCopyrightYear} \\
+    {\large \ThePublisherName}\par
+  \end{titlepage}
+
+%% End of title page.
+%% ----------------------------------------------------------------------------

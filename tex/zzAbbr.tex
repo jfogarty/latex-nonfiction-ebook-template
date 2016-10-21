@@ -1,0 +1,290 @@
+%% ----------------------------------------------------------------------------
+%% Abbreviations, Terms, and Semantic Indexing macros
+%% ----------------------------------------------------------------------------
+
+\ifthenelse{\boolean{NOABBR}}{
+  \newcommand\acsetup[1]{}%
+  \newcommand\DeclareAcronym[2]{}%
+  \newcommand\ac[1]{#1}%
+  \newcommand\acp[1]{#1}%
+}{
+  \usepackage{acro}
+}
+
+% probably a good idea for the nomenclature entries:
+\providecommand\tooltip[2]{[PDF:#1][tooltip:#2]}
+\acsetup{
+% tooltip-cmd = \tooltip ,    % Note Tooltips require ACRO 2.0 AND MORE
+  first-style = short ,
+}
+
+% class `abbrev': abbreviations:
+\DeclareAcronym{ny}{
+  short = NY ,
+  long  = New York ,
+  class = abbrev
+}
+\DeclareAcronym{la}{
+  short = LA ,
+  long  = Los Angeles ,
+  class = abbrev
+}
+\DeclareAcronym{un}{
+  short = UN ,
+  long  = United Nations ,
+  class = abbrev
+}
+
+% class `nomencl': nomenclature
+\DeclareAcronym{angelsperarea}{
+  short = \ensuremath{a} ,
+  long  = The number of angels per unit area ,
+  sort  = a ,
+  class = nomencl
+}
+\DeclareAcronym{numofangels}{
+  short = \ensuremath{N} ,
+  long  = The number of angels per needle point ,
+  sort  = N ,
+  class = nomencl
+}
+\DeclareAcronym{areaofneedle}{
+  short = \ensuremath{A} ,
+  long  = The area of the needle point ,
+  sort  = A ,
+  class = nomencl
+}
+
+\DeclareAcronym{B}{
+  short        = {B},
+  long         = {byte},
+  short-plural = {},
+  long-plural  = {},
+  class        = {non-SI-unit},
+}
+\DeclareAcronym{g}{
+  short        = {g},
+  long         = {gramm},
+  short-plural = {},
+  long-plural  = {},
+  class        = {SI-unit-derived},
+}
+\DeclareAcronym{k}{
+  short        = {k},
+  long         = {kilo},
+  short-plural = {},
+  long-plural  = {},
+  class        = {SI-prefix},
+}
+\DeclareAcronym{kB}{
+  short        = {\acs{k}\acs{B}},
+  long         = {\Acl{k}\acl{B}},
+  short-plural = {},
+  long-plural  = {},
+  class        = {non-SI-unit-derived},
+}
+\DeclareAcronym{kg}{
+  short        = {\acs{k}\acs{g}},
+  long         = {\Acl{k}\acl{g}},
+  short-plural = {},
+  long-plural  = {},
+  class        = {SI-unit},
+}
+\DeclareAcronym{m}{
+  short        = {m},
+  long         = {milli},
+  short-plural = {},
+  long-plural  = {},
+  class        = {SI-prefix},
+}
+\DeclareAcronym{mg}{
+  short        = {\acs{m}\acs{g}},
+  long         = {\Acl{m}\acl{g}},
+  short-plural = {},
+  long-plural  = {},
+  class        = {SI-unit-derived},
+}
+
+\newcommand{\LA}{\ac{la}\xspace}
+\newcommand{\NY}{\ac{ny}\xspace}
+
+\newcommand{\Abb}[2][] {\textsf{#2}\xspace}
+
+%% ----------------------------------------------------------------------------
+%% Semantic item identifier formats and Common Item commands
+
+\newcommand{\BoldName}[1]{\textbf{#1}}
+\newcommand{\ItalicName}[1]{\textit{#1}}
+
+\newcommand{\BookName}[2][] {``\ItalicName{\textit{#2}}''\Ix[#1]{Books}{#2}}
+\newcommand{\StoryName}[2][] {``\ItalicName{\textit{#2}}''\Ix[#1]{Short Stories}{#2}}
+\newcommand{\ArticleName}[2][] {\ItalicName{\textit{#2}}\Ix[#1]{Articles}{#2}}
+\newcommand{\FilmName}[2][] {\ItalicName{#2}\Ix[#1]{Films}{#2}}
+\newcommand{\IdeaName}[2][] {\ItalicName{#2}\Ix[#1]{Ideas}{#2}}
+
+\newcommand{\ConditionName}[2][] {\ItalicName{#2}\Ix[#1]{Diseases and Conditions}{#2}}
+\newcommand{\OrganismName}[2][]  {\ItalicName{#2}\Ix[#1]{Organisms}{#2}}
+\newcommand{\AnimalName}[2][]    {\ItalicName{#2}\Ix[#1]{Animals}{#2}}
+\newcommand{\AnatomyName}[2][]   {\ItalicName{#2}\Ix[#1]{Anatomical Terms}{#2}}
+\newcommand{\ComputerName}[2][]  {\ItalicName{#2}\Ix[#1]{Computational Terms}{#2}}
+
+\newcommand{\PlaceName}[2][]   {#2}
+\newcommand{\CityName}[2][]    {#2\Ix[#1]{Cities}{#2}}
+\newcommand{\Year}[2][]        {#2}
+
+\newcommand{\CountryName}[2][]    {#2\Ix[#1]{Country}{#2}}
+\newcommand{\LanguageName}[2][]   {\textsf{#2}}
+\newcommand{\Command}[2][]        {\texttt{#2}}
+
+\newcommand{\PersonName}[2][]      {\BoldName{\textit{#2}}\Ix[#1]{People}{#2}}
+\newcommand{\CompanyName}[2][]     {\BoldName{#2}\Ix[#1]{Companies}{#2}}
+\newcommand{\ProjectName}[2][]     {\ItalicName{#2\Ix[#1]{Projects}{#2}}}
+\newcommand{\InstitutionName}[2][] {\ItalicName{#2}\Ix[#1]{Institutions}{#2}}
+\newcommand{\UniversityName}[2][]  {\ItalicName{#2}\Ix[#1]{Institutions}{#2}}
+
+\newcommand{\ThingName}[2][]       {\ItalicName{#2}}
+
+%---------------------------------------------------------------------
+% Common item name commands
+
+\newcommand{\Lisp}{\LanguageName{Lisp}\xspace}
+
+%% ----------------------------------------------------------------------------
+%% Artificial Intelligence Terms and Abbreviations
+
+\newcommand{\AiaFmt}[1]{\textsf{#1}}%
+
+\newcommand{\AiAcronymNames}[1]{%
+  \ifthenelse{\boolean{NOABBR}}{%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1\endcsname{\AiaFmt{#1}\xspace}}%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1s\endcsname{\AiaFmt{#1}\xspace}}%
+  }{%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1\endcsname{\ac{#1}\xspace}}%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1s\endcsname{\acp{#1}\xspace}}%
+  }%   
+}
+
+\newcommand{\AiAcronym}[2][] {%
+	\DeclareAcronym{#2}{%
+	  short = \AiaFmt{#2} ,%
+	  long  = {#1} ,%
+	  class = aiabbrev%
+	}%
+	\AiAcronymNames{#2}%
+}
+
+\AiAcronym[Defense Advanced Research Projects Agency]{DARPA}
+
+\AiAcronym[Good Old Fasioned Artificial Intelligence]{GOFAI}%
+\AiAcronym[Application Programming Interface]{API}%
+
+\AiAcronym[Machine Intelligence]{MI}% 
+\AiAcronym[Machine Learning]{ML}% 
+
+\AiAcronym[Artificial Intelligence]{AI}%
+\AiAcronym[Artificial General Intelligence]{AGI}%
+\AiAcronym[Artificial Human Intelligence]{AHI}%
+
+\AiAcronym[Artificial Super Intelligence]{ASI}% 
+\AiAcronym[Neural Networks]{NN}%
+\AiAcronym[Deep Neural Network]{DNN}%
+\AiAcronym[Deep Belief Network]{DBN}%
+\AiAcronym[Convolutional Neural Network]{CNN}% 
+
+\AiAcronym[Augmented Reality]{AR}%
+\AiAcronym[Virtual Reality]{VR}%
+\AiAcronym[Operating System]{OS}%
+
+\AiAcronym[FLoating-point Operations per Second]{FLOPS}%
+\AiAcronym[GigaFLOPS: a Billion FLOPs]{GFLOPS}%
+\AiAcronym[TeraFLOPS: a Trillion FLOPs]{TFLOPS}%
+\AiAcronym[PetaFLOPS: a Million Billion FLOPs]{PFLOPS}% 
+\AiAcronym[ExaFLOPS: a Billion Billion FLOPs]{EFLOPS}%
+\AiAcronym[ZettaFLOPS: a thousand ExaFLOPS]{ZFLOPS}%
+
+%% ----------------------------------------------------------------------------
+%% Neuroscience Terms and Abbreviations
+\newcommand{\NsaFmt}[1]{\textbf{#1}}%
+\newcommand{\NstFmt}[1]{\textbf{#1}}%
+
+\newcommand{\NsTermNames}[2]{%
+  \ifthenelse{\boolean{NOABBR}}{%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1\endcsname{\NsaFmt{#1}\xspace}}%
+  }{%
+    \ifthenelse{\isempty{#1}}{}{\expandafter\newcommand\csname #1\endcsname{\ac{#1}\xspace}}%
+  }%  
+  \expandafter\newcommand\csname #2\endcsname{\NstFmt{#2}\xspace}%
+}
+
+% Define a Neuroscience Term (abbreviation).
+%
+% 	\NsTerm*[abbr]{text name}{long description} % Just define the abbreviation
+% 	\NsTerm[abbr]{text name}{long description} % Defines abbreviation and name macros
+%
+\DeclareDocumentCommand{\NsTerm}{ s o m m }{
+    \IfNoValueF{#2}{%
+	\DeclareAcronym{#2}{%
+	  short = \NsaFmt{#2},%
+	  long  = {[#3] #4},%
+	  class = nsabbrev%
+	}}%
+    \IfBooleanF{#1}{\NsTermNames{#2}{#3}}%
+}
+
+% Use a neuroscience term (good when the term is * and or otherwise cannot be a command).
+\newcommand{\NsABBR}[1]{\ifthenelse{\boolean{NOABBR}}{\NsaFmt{#1}}{\ac{#1}}}%
+
+\NsTerm[NT]{Neurotransmitter}{Any molecule used for signaling across synapses.}
+
+\NsTerm[DA]{Dopamine}{Primary driver of the striatum; a catecholamine neurotransmitter.}
+\NsTerm[E]{Epinephrine}{Both a catecholamine neurotransmitter, and a hormone; also known as adrenaline.}
+\NsTerm[NE]{Norepinephrine}{A catecholamine neurotransmitter; also known as noradrenaline.}
+
+\NsTerm[OFC]{orbitofrontal cortex.}
+  {Involved in making predictions about motivationally-significant events.
+   Critical to forming a wider network of past and present associations.}
+
+\NsTerm[BLA]{basolateral amygdala}
+  {Critical to making predictions about motivationally-significant events.
+   Possibly integral to updating information about cue–outcome contingencies.}
+   
+\NsTerm[EC]{entorhinal cortex}{An area of the brain located in the medial temporal lobe and functioning as a hub in a widespread network for memory and navigation. Part of the hippocampus.}
+
+\NsTerm[BG]{basal ganglia}{A set of nuclei strongly interconnected with the neocortex, thalamus, and brainstem; associated with control of voluntary motor movements, procedural learning, cognition and emotion.}
+
+\NsTerm[GP]{globus pallidus}{The GP has internal and external sections, and are parts of the basal ganglia that accept inputs from the putamen.}
+\NsTerm[GPi]{globus pallidus, internal segment}{Part of the GP that connects directly to the thalamus.}
+\NsTerm[GPe]{globus pallidus, external segment}{Part of the GP that connects to the STN.}
+
+\NsTerm[STN]{subthalamic nucleus}{A functional part of the basal ganglia that is actually located below the thalamus. Thought to serve as an
+interface between the brain's motor and non-motor (cognitive and limbic) circuits.}
+
+\NsTerm[SN]{substantia nigra}{The SN is a part of the basal ganglia located down in the midbrain, where it consists of two main parts: the pars reticulata and pars compacta. The pars compacta is the primary source of dopamine to the striatum, while the pars reticulata provides mediated outputs from the striatum to the thalamus.}
+
+\NsTerm[CC]{corpus callosum}{The largest white matter tract in the brain connecting the two halves together.}
+
+\NsTerm[SNc]{substantia nigra pars compacta}{Part of the SN that produces Dopamine for the striatum.}
+\NsTerm[SNr]{substantia nigra pars reticulata}{Part of the SN that connects striatum to thalamus.}
+
+\NsTerm*[AC]{anterior commissure}{The largest whitematter tract in the brain connecting the tow halves together}
+
+\NsTerm*[5HT]{Serotonin}{a monoamine neurotransmitter}
+
+%% ----------------------------------------------------------------------------
+% Neurological and Psychiatric conditions
+\NsTerm[TGA]{Transient Global Amnesia}{A rare condition in which no new memories are formed for a period of a few hours.}
+
+%%---------------------------------------------------------------------
+%%---------------------------------------------------------------------
+%% Produce the tables of Abbreviations, Acronyms, and Terms.
+\newcommand{\PrintAcronyms}[1][]{
+	\printacronyms[name=All Abbreviations and Terms]
+
+	\printacronyms[include-classes=nomencl,name=Nomenclature]
+
+	\printacronyms[include-classes=aiabbrev,name=Abbreviations (Computation)]
+
+	\printacronyms[include-classes=nsabbrev,name=Abbreviations (Neuroscience)]
+}
+
+%%---------------------------------------------------------------------

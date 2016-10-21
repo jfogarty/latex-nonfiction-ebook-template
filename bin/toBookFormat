@@ -1,0 +1,674 @@
+#!/bin/bash
+# Convert a .tex into a PDF, Kindle mobi, or iBook epub in a subdirectory.
+# ----------------------------------------------------------------------------
+# LaTeX eBook utility tools
+# -----------------------------------------------------------------------------
+# John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
+# -----------------------------------------------------------------------------
+declare fullScriptName=$_
+declare scriptName=$(basename $0)
+
+# Scripts calls other scripts in the same directory by simple name.
+declare absScriptFile=$(readlink -f "$0")
+declare absScriptPath=$(dirname "$absScriptFile")
+PATH=$absScriptPath:$PATH
+
+declare -x bookName # Export to shell.
+declare -a devNames
+declare toDir
+declare toformat
+declare bibName
+declare parametersName
+declare setParametersScript="setParameters.bash"
+declare rebuildScript="rebuild.bash"
+
+declare destDescription
+declare lastLogFile
+declare topdf=0
+declare tokindle=0
+declare toebook=0
+declare tohtml=0
+declare ishtml=0
+declare totext=0
+declare toraw=0
+declare trialRun=0
+declare verbose=0
+declare quiet=0
+declare noClean=0
+declare logindex=1
+declare copyImages=0
+declare doshift=0
+declare argv
+declare rv
+
+#------------------------------------------------------------------------
+# Terminate the script with a failure message.
+
+# echo text if not quiet
+function qecho()
+{
+    if [[ $quiet -eq 0 ]]; then
+        echo "$@"
+    fi
+}
+
+# echo text if in verbose mode.
+function vecho()
+{
+    if [[ $verbose -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
+function fail()
+{
+    local msg=$1
+    qecho "[$scriptName] *** Failed: $msg"
+    exit 666
+}
+
+function requireFile()
+{
+	local fileType=$1
+	local fileName=$2
+    if [[ ! -e "$fileName" ]]; then
+        fail "$fileType input file '$fileName' does not exist"
+    fi
+}
+
+function checkDir()
+{
+	local dirName=$1
+	local fileName=$2
+    if [[ -e "$dirName" ]]; then
+        local toFile="$dirName/$fileName"
+        if ! [[ -e "$toFile" ]]; then
+            qecho "*** Suspicious target directory. Clear it yourself first."
+            fail "$toFile should exist."
+        fi
+    fi
+}
+
+#------------------------------------------------------------------------
+# Checks to see if a directory is the same as another.
+# return 0 (success) if the directories are the same
+function dirMatches
+{
+    local dir1=$1
+    local dir2=$2
+    if [[ -e "$dir1" ]] && [[ -e "$dir2" ]]; then
+        [[ "$(stat -c "%d:%i" $dir1)" == "$(stat -c "%d:%i" $dir2)" ]] && return 0
+    fi
+    return 1
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function runIgnore()
+{
+    if [[ $trialRun -ne 0 ]]; then
+        qecho "--Run:[$@]"
+    else
+       vecho "- $@"
+       echo "$@" >> $rebuildScript
+       eval "$@"
+    fi
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function run()
+{
+    runIgnore "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        qecho "[$scriptName] *** Error with [$1]" >&2
+        exit $status
+    fi
+    return $status
+}
+
+#------------------------------------------------------------------------
+# Remove a specified extension from a filename if its present.
+# Return resulting file in rv.
+function removeExtension()
+{
+    local fileName=$1
+    local extName=$2
+    if [[ "${fileName%.*}.$extName" == "$fileName" ]]; then
+        fileName=${fileName%.*}
+    fi
+    if [[ "${fileName:(-1)}" == "." ]]; then
+        fileName=${fileName%.*}
+    fi    
+    rv="$fileName"
+}
+
+#------------------------------------------------------------------------
+# Strip : and = from argument text
+function dirArg()
+{
+    local dirName=$1
+    if [[ ${dirName:0:1} == ":" ]] ; then
+        dirName=${dirName:1}
+    fi
+    if [[ "${dirName:0:1}" == "=" ]] ; then
+        dirName=${dirName:1}
+    fi
+    rv="$dirName"
+}
+
+#------------------------------------------------------------------------
+# Copy files to the target directory conversion (after clearing it)
+function copyIfExists()
+{
+    local theFile=$1
+    local theDest=$2
+    if [[ -e "$theFile" ]]; then
+        run "cp \"$theFile\" \"$theDest\""
+    fi
+}
+
+# Modify the book.tex by setting a \Boolean parameter to a specific value.
+function doSetBookBoolean()
+{
+    local texFile="$1"
+    local paramName="$2"
+    local boolValue="$3"
+    local theValue="false"
+    if [[ $boolValue -eq 1 ]]; then
+        theValue="true"
+    fi
+    run "setBookBoolean \"$texFile\" $paramName $theValue"
+}
+
+#------------------------------------------------------------------------
+# Copy files to the target directory conversion (after clearing it)
+function prepareDir()
+{
+    if [[ -e "$rebuildScript" ]]; then
+        rm $rebuildScript
+    fi
+    run "PATH=\"$absScriptPath:$PATH\""
+    local bp="BookParameters.tex"
+    if [[ -d "$toDir" ]]; then
+        if test "$(ls -A "$toDir")"; then
+            checkDir "$toDir" "$bookName.tex"
+            checkDir "$toDir" "$bibName.bib"
+            qecho "- Clearing (deleting) $toDir/*"
+            run "rm -rf '$toDir/*'"
+        else
+            vecho "- The output directory $toDir is empty"
+        fi
+    fi
+    run "mkdir -p \"$toDir/logs\""
+    
+    if ! dirMatches "$toDir/.."  "." ; then
+        # if the parent directory of the target is also the source
+        # then images can be fetched from it. If not, the images dir
+        # must be included in the target.
+        qecho "- Force copy of the images sub-directory"
+        copyImages=1
+    fi    
+    
+    if [[ $copyImages -eq 1 ]]; then
+        run "mkdir -p \"$toDir/images\""
+    fi
+    run "mkdir -p \"$toDir/tex\""
+    run "cp $bookName.tex   \"$toDir\""
+    copyIfExists "$bookName.cfg" "$toDir"
+    copyIfExists "$bibName.bib"  "$toDir"
+    if [[ $ishtml -eq 1 ]]; then
+        copyIfExists "tex4ht.env"   "$toDir"
+#       copyIfExists "idxmake.4ht"  "$toDir"
+    fi
+    if [[ $copyImages -eq 1 ]]; then
+        run "cp -R ./images/* \"$toDir/images\""
+    fi
+    run "cp -R ./tex/*        \"$toDir/tex\""
+    if [[ tohtml -eq 1 ]]; then
+        copyIfExists "${bookName}Entry.html"  "$toDir/index.html"
+    fi
+    if [[ -e "$setParametersScript" ]]; then
+        run "cp \"$setParametersScript\" \"$toDir\""
+        run "rm '$setParametersScript'"
+    fi
+    if [[ -e "$bp" ]]; then
+        run "cp \"$bp\" \"$toDir\""
+    fi
+    
+    # Now in the newly populated sub-directory.
+    run "cd \"$toDir\""
+
+    # Make sure the related scripts are available
+    run "PATH=\"$absScriptPath:$PATH\""
+    if [[ $copyImages -eq 0 ]]; then
+        qecho "- Enable use of ../images from parent directory"
+        doSetBookBoolean $bookName PARENTIMAGES 1
+    fi
+    
+    # Execute the parameters setting script as needed.
+    if [[ -e "$setParametersScript" ]]; then
+        run "source ./$setParametersScript"
+    fi    
+}
+
+# Run a command log its output to a subdirectoried log file.
+function logrun()
+{
+    local msg=$1
+    local cmd=$2
+    local parms=$3
+    local fromstream=$4
+    local ignoreError=0
+    local logbase=$(basename $cmd)
+    local logfile="./logs/${logindex}_$logbase.log"    
+    lastLogFile="$logfile"
+    if [[ $fromstream -lt 0 ]]; then
+        let fromstream=-$fromstream
+        let ignoreError=1
+    fi
+    if [[ $fromstream -eq 0 ]]; then
+        local fullcmd="$cmd $parms | tee $logfile"
+    else 
+        if [[ $fromstream -eq 3 ]]; then
+          fromstream="&"
+        fi
+        local fullcmd="$cmd $parms $fromstream> \"$logfile\""
+    fi
+    qecho "- $msg"
+    if [[ ignoreError -eq 0 ]]; then
+        run "$fullcmd" 
+    else
+        runIgnore "$fullcmd" 
+    fi
+    let logindex+=1
+}
+
+function xlogrun()
+{
+    local xtrialRun=$trialRun
+    local xverbose=$verbose
+    verbose=1
+    trialRun=1
+    logrun "$@"
+    trialRun=$xtrialRun
+    verbose=$xverbose
+}
+
+# pdflatex -synctex=1 -interaction=nonstopmode "book".tex 1> "1_pdflatex.log"
+# bibtex "book".aux                                       1> "2_bibtex.log"
+# makeindex "book".idx                                    2> "3_makeindex.log"
+# pdflatex -synctex=1 -interaction=nonstopmode "book".tex 1> "3_pdflatex.log"
+# authorindex "book" > "3_authorindex.log"                2> "4_authorindex.log"
+# pdflatex -synctex=1 -interaction=nonstopmode "book".tex 1> "5_pdflatex.log"
+function makePdf()
+{
+    local pdfparms="-synctex=1 -interaction=nonstopmode \"$bookName\".tex"
+    if [[ totext -eq 1 ]]; then
+        pdfparms="--output-format=dvi $pdfparms"
+        logrun "Latex to DVI ($bookName.dvi)" "pdflatex" "$pdfparms" -1
+    else
+        logrun "Latex to PDF -- pass 1" "pdflatex" "$pdfparms" 1
+        logrun "Generate bibliography" "bibtex" "\"$bookName\".aux" 1
+        logrun "Latex to PDF -- pass 2" "pdflatex" "$pdfparms" 1
+        logrun "Generate referenced authors list" "authorindex" "\"$bookName\"" 2
+        logrun "Generate index" "makeindex" "\"$bookName\".idx" 2
+        logrun "Latex to PDF -- pass 3" "pdflatex" "$pdfparms" 1
+        logrun "Latex to PDF -- pass 4" "pdflatex" "$pdfparms" 1
+    fi
+ }
+
+function makeMobi()
+{
+    local cmd="$bookName.tex"
+    if [[ -e "$bookName.cfg" ]]; then
+        cmd="--config $bookName.cfg $cmd"
+    fi
+    logrun "Create Kindle .mobi file" "tex4ebook" "--format mobi $cmd" 3
+    echo "*** WARNING *** This IS not a usable .mobi file."
+    echo "*** You should create an .epub then edit it with Calibre."
+}
+
+function makeEpub()
+{
+    local cmd="$bookName.tex"
+    if [[ -e "$bookName.cfg" ]]; then
+        cmd="--config $bookName.cfg $cmd"
+    fi
+    logrun "Create iBook .epub file(s) - pass 1" "tex4ebook" "$cmd" 3
+    logrun "Hypertext index preprocessor" "tex" "'\\def\\filename{{$bookName}{idx}{4dx}{ind}} \\input idxmake.4ht'" 1    
+    logrun "Make hyperlinked index" "makeindex" "-o \"$bookName\".ind \"$bookName\".4dx " 2    
+    logrun "Create iBook .epub file - pass 2" "tex4ebook" "$cmd" 3
+    logrun "Check the .epub file for problems and non-conformance" "epubcheck" "$bookName.epub" -3
+    
+    if [[ $trialRun -eq 0 ]]; then
+        local lineCount=`wc -l < "$lastLogFile"`
+        if grep -F "Check finished with errors" "$lastLogFile"; then
+		    echo "*** Errors were found in the $bookName.epub ***"
+            local errCount=`grep -o '^ERROR(' "$lastLogFile" | wc -l`
+            if [[ $verbose -eq 1 ]]; then
+                run "cat $lastLogFile"
+            fi
+            echo "- IMPORTANT: Examine epubcheck log ($lastLogFile) and correct the $errCount errors."
+        else
+            qecho "- There were NO errors found in epubcheck log: $lastLogFile"
+        fi
+    fi
+}
+
+function makeText()
+{
+    qecho "- Convert the $bookName.dvi into a raw text file."
+    runIgnore "catdvi $bookName.dvi 1> $bookName.tx1 2> $bookName.der"
+    qecho "- Remove the extra spaces from the text."
+    run "perl -pe 's/[ ]+/ /g' < $bookName.tx1 1> $bookName.txt"
+}
+
+# htlatex eBook
+# tex '\def\filename{{eBook}{idx}{4dx}{ind}} \input idxmake.4ht'
+# makeindex -o eBook.ind eBook.4dx
+# htlatex eBook
+function makeHtml()
+{
+    logrun "Generate HTML -- pass 1" "htlatex" "\"$bookName\"" 3
+    logrun "Hypertext index preprocessor" "tex" "'\\def\\filename{{$bookName}{idx}{4dx}{ind}} \\input idxmake.4ht'" 1
+    logrun "Make hyperlinked index" "makeindex" "-o \"$bookName\".ind \"$bookName\".4dx " 2    
+    logrun "Generate HTML -- pass 2" "htlatex" "\"$bookName\"" 3
+}
+
+#------------------------------------------------------------------------
+function evalrv()
+{
+    #rv=`$cmd`  # Odd perl issues. Output to tmp file instead.
+    eval $1 > x.tmp 
+    rv=`cat x.tmp`
+    rm x.tmp
+}
+
+function getBookParam()
+{
+    local pname=$1
+    local cmd='perl -0ne '"'"'print "$1\n" if /\\'"$pname"'{(.*)}/g'
+    local cmd+="' < $parametersName.tex"
+    #echo "-----------[$cmd]" 
+    evalrv "$cmd"
+}
+
+function getTexParam()
+{
+    #perl -0ne '"print "[$1]\n" if /\\Boolean{RAWHTML}\s*{(.*)}/g' eBook.tex
+    local pname=$1
+    local cmd='perl -0ne '"'"'print "$1\n" if /\\Boolean{'"$pname"'}\s*{(.*)}/g'
+    local cmd+="' < $bookName.tex"
+    #echo "-----------[$cmd]" 
+    evalrv "$cmd"
+}
+
+function showBookInfo()
+{
+
+    local -a bookParams=(
+        "TheMainTitle"
+        "TheSubTitle"
+        "TheBookSeries"
+        "TheAuthor"
+        "TheAuthorLNF"
+        "PrintISBN"
+        "PrintISBNShort"
+        "EbookISBN"
+        "EbookISBNShort"
+        "TheCopyrightYear"
+        "TheEdition"
+        "TheLCCN"
+        "TheDDSN"
+        "TheLCPCN"
+        "ThePublisherName"
+        "ThePublisherAddrA"
+        "ThePublisherAddrB"
+        "ThePrinter"
+        "TheSubjectArea"
+        "TotalPageCount"
+    )
+
+    for e in "${bookParams[@]}"; do
+        getBookParam "$e"
+        printf 'Parameter: %20s : %-6s\n' "$e" "$rv"
+        t=0
+    done       
+    printf '\n'
+    local -a texParams=(
+        "ISBOOK"      "This is formatted as a book"
+        "FINALFORM"   "Ready for publication"
+        "EDITMODE"    "Editing mode (double spaced)"
+        "WATERMARK"   "Place a watermark on the text (SLOW)"
+        "TOHTML"      "Format for Tex4HT conversion"
+        "TOMOBI"      "Extra Formatting for Kindle .MOBI"
+        "TOEPUB"      "Extra Formatting for IDPF .EPUB"
+        "RAWHTML"     "Allow /HCode directly in text [no PDF]"
+        "TOPRESS"     "Format for paper printing" 
+        "NOCOLOR"     "Format for monochrome output"
+        "NOBODY"      "Incude only the intro [debugging]"
+        "NOLISTS"     "Do not generate lists of figures and tables"
+        "NOFIGLIST"   "Do not generate list of tables"
+        "NOTABLIST"   "Do not generate list of figures"
+        "NOINDEX"     "Do not generate index entries"
+        "NOAUTHORS"   "Do not include the Authors section"
+        "NOHYPERREF"  "Disables hyperref - href linking"
+        "SUBCAPTIONS" "Allow subcaptioned figures"
+        "NOABBR"      "Suppress abbreviations"
+    )
+    local t=0
+    for e in "${texParams[@]}"; do
+        if [[ $t -eq 0 ]]; then
+            p="$e"
+            t=1
+        else
+            getTexParam "$p"
+            printf 'Format %11s : %-6s  %s\n' "$p" "$rv" "$e"
+            t=0
+        fi
+    done
+
+    getBookParam "TotalPageCount"; local pages="$rv"
+    getBookParam "PaperWidthPt";   local width="$rv"
+    getBookParam "PaperHeightPt";  local height="$rv"
+
+    printf '\nBook Format %s x %s (%s pages)\n\n' $width $height $pages 
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function scriptUsage()
+{
+    if [[ -z "$toDir" ]]; then
+        echo "Usage: $scriptName [format] [options] [bookname] [bibname]"
+        echo ""
+        echo "Formats:"
+        echo "  --toebook    : make and check an .epub ebook."
+        echo "  --tokindle   : make a draft .mobi kindle ebook."
+        echo "  --topdf      : make a hyperlinked PDF file."
+        echo "  --totext     : make an ascii text editing copy."
+        echo "  --toraw      : copy book files to a directory."
+    else
+        echo "Usage: $scriptName $toformat [options] [bookname] [bibname]"
+        echo "Produce $destDescription from $bookName.tex"
+    fi
+    echo ""
+    echo "Options:"
+    echo "  -d=[todir]     set output directory name."
+    echo "  -c             copy images directory into target."
+    echo "  -i             show the current book info (parameters)."  
+    echo "  -n             do not clean up (delete) intermediate files."
+    echo "  -v             verbose output during command execution."
+    echo "  -q             quiet mode. Disables all console output."
+    echo "  -t             trial run -- commands are shown but not executed."
+    echo ""
+    if [[ -n "$toDir" ]]; then
+        echo "A $toDir subdirectory is created and populated with the"
+        echo "[bookname].tex. The optional [bibname].bib is also copied"
+        echo "as are the /tex and /images directories."
+    fi
+    echo "If [bibname] is omitted, book.bib is assumed."
+    echo ""
+    echo "Each command produces its own log file in the logs subdirectory."
+    echo "*** NOTE *** The target directory is cleared first. BE CAREFUL."
+    if [[ $tokindle -eq 1 ]]; then
+        echo ""
+        echo "*** NOTE *** The Calibre EPUB to MOBI is MUCH better than"
+        echo "using this program.  You can edit and validate the EPUB"
+        echo "before publication and it produces a superior MOBI file."
+        echo "Use this only for DRAFT versions of your .mobi!"
+    fi
+    echo ""	
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function scriptVersion()
+{
+    local v="$1"
+    #echo "--- Checking [$argv] == [--$v]"
+    if [[ "$argv" == "--$v" ]]; then
+        doshift=1
+        return 0
+    fi    
+    if [[ "$scriptName" == "$v" ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+#------------------------------------------------------------------------
+function main()
+{
+    logindex=1 #Start the log numbering over each run.
+    if [[ -z "$1" ]]; then
+        scriptUsage 
+    fi
+    removeExtension "$1" "tex"; local bookName="$rv"
+    removeExtension "$2" "bib"; local bibName="$rv"
+    if [[ "." -ef "$toDir" ]]; then
+        fail "Input and output directory cannot be the same"
+    fi
+    # Use the 'book.bib' unless one is explicitly provided.
+    if [[ -z "$bibName" ]]; then
+        bibName="book"
+    fi
+    requireFile "LaTex"  "$bookName.tex"
+    requireFile "BibTex" "$bibName.bib"
+    if [[ $showInfo -eq 1 ]]; then
+        requireFile "Parameters"  "$parametersName.tex"
+    else
+        vecho "- Converting LaTex book into $destDescription."
+        vecho "---  Input Tex:$bookName.tex"
+        vecho "---  Input Bib:$bibName.bib"
+        vecho "--- Output dir:$toDir"
+        prepareDir
+        if [[ $toraw -eq 0 ]]; then
+            makePdf
+        fi
+        if [[ $totext -eq 1 ]]; then
+            makeText
+        fi        
+        if [[ $tokindle -eq 1 ]]; then
+            makeMobi
+        fi
+        if [[ $toebook -eq 1 ]]; then
+            makeEpub
+        fi
+        if [[ $tohtml -eq 1 ]]; then
+            makeHtml
+        else
+            if [[ $noClean -eq 0 ]]; then 
+               run texclean -q "$bookName.tex"
+           fi
+        fi    
+    fi
+    qecho "- Done."
+    exit 0
+}
+
+#------------------------------------------------------------------------
+# Script entry point.
+
+argv="$1"
+parametersName="BookParameters"
+bibName="book"
+bookName="book"
+if scriptVersion "tokindle" ; then
+    toformat="--tokindle"
+    destDescription="kindle .mobi book file"
+    toDir="./mobi"
+    ishtml=1
+    tokindle=1
+    copyImages=1 # ePUBs require images in a local sub-directory.
+fi
+if scriptVersion "toebook" ; then
+    toformat="--toebook"
+    destDescription="iBook .epub book file"
+    toDir="./epub"
+    ishtml=1
+    toebook=1
+    copyImages=1 # ePUBs require images in a local sub-directory.
+fi
+if scriptVersion "topdf" ; then
+    toformat="--topdf"
+    destDescription="PDF book file"
+    toDir="./pdf"
+    topdf=1
+fi
+if scriptVersion "totext" ; then
+    toformat="--totext"
+    destDescription="Raw ASCII text file"
+    toDir="./asciitext"
+    totext=1    
+fi
+if scriptVersion "tohtml" ; then
+    toformat="--tohtml"
+    destDescription="HTML Web Pages"
+    toDir="./html"
+    ishtml=1
+    tohtml=1
+    copyImages=1 # HTML is better with its own images directory
+fi
+if scriptVersion "toraw" ; then
+    toformat="--toraw"
+    destDescription="Raw clean directory"
+    toDir="./raw"
+    toraw=1
+fi
+    
+if [[ $doshift -eq 1 ]]; then
+    shift
+fi
+
+OPTIND=1 # Reset in case getopts has been used previously in the shell.
+while getopts "h?ncviqtd:" opt; do
+    case "$opt" in
+        h|\?)
+            scriptUsage
+            exit 0
+            ;;
+        i)  showBookInfo 
+            ;;            
+        v)  verbose=1
+            ;;
+        q)  quiet=1
+            ;;
+        t)  trialRun=1
+            ;;
+        c)  copyImages=1
+            ;;
+        n)  noClean=1
+            ;;            
+        d)  dirArg "$OPTARG"; toDir="$rv"
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+main "$@"
+# - End of bash script.
+

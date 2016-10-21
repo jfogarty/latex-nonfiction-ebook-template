@@ -1,0 +1,94 @@
+\chapter{Introduction}
+\label{intro}%
+
+This is the first intro line for this book. I'll use the intro to illustrate the various features of the template.  For example here is a footnote\footnote{\MusicNote - This endnote starts and ends with a musical note, but only on platforms that support them. \MusicNote}
+
+\begin{itemize}
+\item \large{A List Item}
+\item \large{Another List Items}
+\item \large{And still another one}
+\end{itemize}
+
+Now, lets look at an HREF that will give us lots of trouble. When a link is long and contains characters that make LaTeX crazy (like underscores) sometimes we need to add a print form since the hyperlink format can't be used in the print-on-demand book. Here's the reference: \HREFX{what if the spider I killed in my home has spent his entire life thinking he was my room-mate and that suddenly I had some sort of psychotic break}{https://www.reddit.com/r/Showerthoughts/comments/3adiyt/what_if_the_spider_i_killed_in_my_home_has_spent/}{https://www.reddit.com\-/r/Showerthoughts\-/comments/\-3adiyt/what\_if\\ \_the\_spider\-\_i\_killed\_in\_my\_home\_has\_spent/} --- from a random reddit post.
+
+\begin{figure}[ht] %  \VR and h=here, t=top, b=bottom
+  \centering
+  \ifthenelse{\boolean{SUBCAPTIONS}}{
+	  \begin{subfigure}{0.45\textwidth}
+	    \Image[width=\textwidth]{Flower1}{jpg}
+	    \caption{A flower}
+	    \label{fig:flower1}
+	  \end{subfigure}
+	  \begin{subfigure}{0.45\textwidth}
+	    \Image[width=\textwidth]{Flower2}{jpg}
+	    \caption{Another flower}
+	    \label{fig:flower2}
+	  \end{subfigure}
+  }{
+    \Image[width=0.85\textwidth]{Flowers1and2}{jpg}  
+  }
+  \caption{Some Stupid Flowers} 
+  \label{fig:flowerstuff}
+\end{figure}
+
+Here's some more text\footnote{And here's another end note}. Here I'll used some computer terms: \ComputerName{Bayesian networks}, \ComputerName{support vector machines}, an acronym: \AGI and its definition (\IdeaName{Artificial General Intelligence}), so you can see how indexing works for these things.
+
+Here's \VR (\IdeaName{Virtual Reality} as another example.
+
+\LineSeparator
+
+Here I'll use some indexable terms from neuroscience (such as the \AnatomyName{corpus callosum}, \AnatomyName{arcuate fasciculus}, and the \AnatomyName{corona radiata}). To illustrate some neuroscience abbreviations lets use the neurotransmitters \NE, \DA, \ac{5HT}. Note how 5HT does not have a corresponding command name, since is not a legal LaTeX word.
+
+So, now that we've established that this is a technical book, lets add in a citation from our book.bib.  Baye's Theorem should suffice\cite{bayes1763}. Also, since we like math, let's cite\cite{laplace1774}.
+
+\LineSeparator
+\section{Some Fiddling with LaTeX}
+
+\newcommand{\R}{$\mathbb{R}$}
+\newcommand{\C}{$\mathbb{C}$}
+%    
+%\usetikzlibrary{shadings}
+%\tikz\shade[shading=Mandelbrot set] (0,0) rectangle (10,10);
+   
+The set of real numbers is represented by a blackboard bold capital R: \R.
+The set of complex numbers is represented by a blackboard bold capital C: \C.
+
+%\setlength{\unitlength}{0.8cm}
+%\begin{picture}(12,4)
+%\thicklines
+%\put(8,3.3){{\footnotesize $3$-simplex}}
+%\put(9,3){\circle*{0.1}}
+%\put(8.3,2.9){$a_2$}
+%\put(8,1){\circle*{0.1}}
+%\put(7.7,0.5){$a_0$}
+%\put(10,1){\circle*{0.1}}
+%\put(9.7,0.5){$a_1$}
+%\put(11,1.66){\circle*{0.1}}
+%\put(11.1,1.5){$a_3$}
+%\put(9,3){\line(3,-2){2}}
+%\put(10,1){\line(3,2){1}}
+%\put(8,1){\line(1,0){2}}
+%\put(8,1){\line(1,2){1}}
+%\put(10,1){\line(-1,2){1}}
+%
+%\end{picture}
+%    
+% \setlength{\unitlength}{0.8cm}
+%\begin{picture}(10,5)
+%\thicklines
+%\qbezier(1,1)(5,.6)(1,6)
+%\put(4,4){{Bézier curve}}
+%\end{picture}
+    
+Look at the following formula:
+%
+\begin{equation}
+K_BT_k=Dexp\left\lbrace -\frac{1}{2N(E_F)|J|}\right\rbrace
+\end{equation}
+%
+where $Dexp$ is a long sentence guaranteed to take us over the
+end of this line and well into the next. See, it looks fine.
+
+\blindtext[4]
+
+This is the end of the chapter. And so it goes.
