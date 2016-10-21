@@ -374,7 +374,7 @@ to use other printers, but you may decide to save the bucks.
 
 Once you have your ISBNs, modify the `BookParameters.tex` fields, **PrintISBN**,
 **PrintISBNShort**, **EbookISBN**, and **EbookISBNShort**. 13 digit ISBN numbers
-can be converted to 10 digit an vice versa using [this tool]().  
+can be converted to 10 digit an vice versa using [this tool](http://pcn.loc.gov/isbncnvt.html).  
 
 
 # Utility Programs

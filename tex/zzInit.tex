@@ -21,7 +21,6 @@
 \usepackage{xparse}                     % Extended newcommands
 \usepackage{makeidx}					% Enable Index creation
 \usepackage[tight]{shorttoc}            % Allow an abbreviated table of contents.
-\usepackage{makeidx}					% Enable Index creation
 
 % Note BIBLATEX is *cannot* be enabled with these packages.
 %\usepackage[backend=biber]{biblatex}   % Use the BIBER citation generator
@@ -152,11 +151,13 @@
 
 %---------------------------------------------------------------------
 % Add Index[optional index text]{permuted section name}{index text}
+\newcommand{\CatIndex}[2]{\Index{#1!\textsf{#2}}}
+
 \newcommand{\Ix}[3][]{%
-\ifthenelse{\isempty{#1}{}}{{\Index{#2!#3}\Index{#3}}}{{\Index{#2!#1}\Index{#1}}}%
+  \ifthenelse{\isempty{#1}}{\CatIndex{#2}{#3}\Index{#3}}{\CatIndex{#2}{#1}\Index{#1}}%
 }
 
-\newcommand{\Inx}[2][]{#2\Index{#2}}
+\newcommand{\Inx}[2][]{\ifthenelse{\isempty{#1}}{#2\Index{#2}}{#2\Index{#1}}}
 \newcommand{\PInx}[3][]{#3\Ix[#1]{#2}{#3}}
 
 %%---------------------------------------------------------------------
