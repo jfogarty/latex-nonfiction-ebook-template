@@ -1,0 +1,238 @@
+#!/bin/bash
+# Install a cover project into the book project.
+# ----------------------------------------------------------------------------
+# LaTeX eBook utility tools
+# -----------------------------------------------------------------------------
+# John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
+# -----------------------------------------------------------------------------
+
+declare fullScriptName=$_
+declare scriptName=$(basename $0)
+
+# Scripts calls other scripts in the same directory by simple name.
+declare absScriptFile=$(readlink -f "$0")
+declare absScriptPath=$(dirname "$absScriptFile")
+PATH=$absScriptPath:$PATH
+
+declare toDir="cover"
+declare parametersName
+
+declare trialRun=0
+declare verbose=0
+declare quiet=0
+declare logindex=1
+declare rv
+declare useGit=0
+declare gitDir="latex-createspace-bookcover"
+declare fromDir="../$gitDir"
+declare gitCover="https://github.com/jfogarty/$gitDir.git"
+
+#------------------------------------------------------------------------
+# Terminate the script with a failure message.
+
+# echo text if not quiet
+function qecho()
+{
+    if [[ $quiet -eq 0 ]]; then
+        echo "$@"
+    fi
+}
+
+# echo text if in verbose mode.
+function vecho()
+{
+    if [[ $verbose -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
+function fail()
+{
+    local msg=$1
+    qecho "[$scriptName] *** Failed: $msg"
+    exit 666
+}
+
+function requireFile()
+{
+	local fileType=$1
+	local fileName=$2
+    if [[ ! -e "$fileName" ]]; then
+        fail "$fileType input file '$fileName' does not exist"
+    fi
+}
+
+function requireDir()
+{
+	local dirName=$1
+    if [[ ! -e "$dirName" ]]; then
+        fail "Directory '$dirName' does not exist"
+        if [[ ! -d "$dirName" ]]; then
+            fail "'$dirName' is not a directory"
+        fi        
+    fi
+}
+
+function checkDir()
+{
+	local dirName=$1
+	local fileName=$2
+    if [[ -e "$dirName" ]]; then
+        local toFile="$dirName/$fileName"
+        if ! [[ -e "$toFile" ]]; then
+            qecho "*** Suspicious target directory. Clear it yourself first."
+            fail "$toFile should exist."
+        fi
+    fi
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function runIgnore()
+{
+    if [[ $trialRun -ne 0 ]]; then
+        qecho "--Run:[$@]"
+    else
+       vecho "- $@"
+       eval "$@"
+    fi
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function run()
+{
+    runIgnore "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        qecho "[$scriptName] *** Error with [$1]" >&2
+        exit $status
+    fi
+    return $status
+}
+
+#------------------------------------------------------------------------
+# Remove a specified extension from a filename if its present.
+# Return resulting file in rv.
+function removeExtension()
+{
+    local fileName=$1
+    local extName=$2
+    if [[ "${fileName%.*}.$extName" == "$fileName" ]]; then
+        fileName=${fileName%.*}
+    fi
+    if [[ "${fileName:(-1)}" == "." ]]; then
+        fileName=${fileName%.*}
+    fi    
+    rv="$fileName"
+}
+
+#------------------------------------------------------------------------
+# Strip : and = from argument text
+function dirArg()
+{
+    local dirName=$1
+    if [[ ${dirName:0:1} == ":" ]] ; then
+        dirName=${dirName:1}
+    fi
+    if [[ "${dirName:0:1}" == "=" ]] ; then
+        dirName=${dirName:1}
+    fi
+    rv="$dirName"
+}
+
+#------------------------------------------------------------------------
+# Copy files to the target directory conversion (after clearing it)
+function copyIfExists()
+{
+    local theFile=$1
+    local theDest=$2
+    if [[ -e "$theFile" ]]; then
+        run cp "$theFile" "$theDest"
+    fi
+}
+
+#------------------------------------------------------------------------
+# Install the cover locally
+function installCover()
+{
+    local bookDir=${PWD##*/}
+    if [[ ! -e "$fromDir" ]]; then 
+        if [[ $useGit == 1 ]]; then
+            fromDir="../$gitDir"
+            cd ..
+            run "git clone \"$gitCover\""
+            cd "$bookDir"
+        else
+            fail "$fromDir does not exist. -g will clone from github."
+        fi
+    fi
+    requireDir "$fromDir/bin"
+    requireDir "$fromDir/cover"
+    requireDir "$fromDir/images"
+    requireFile "Cover LaTeX file" "$fromDir/cover/Cover.tex"
+    run "mkdir cover"
+    run "cp -rf $fromDir/cover/*  cover"
+    run "cp -rf $fromDir/images/* images"
+    run "cp -rf $fromDir/bin/*    bin"
+ }
+
+#------------------------------------------------------------------------
+function scriptUsage()
+{
+    echo "Usage: $scriptName [options]"
+    echo "Install a Cover project into this book project"
+    echo ""
+    echo "Options:"
+    echo "  -g         Fetch cover from GitHub if not available."
+    echo "  -t         trial run -- commands are shown but not executed."
+    echo "  -v         verbose output during command execution."
+    echo "  -q         quiet output during command execution."
+    echo "  -d=dir     set cover source directory."
+    echo ""
+    echo "By default the input directory is $fromDir,"
+    echo "which is also where it will be installed if -g is specified."
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function main()
+{
+    requireFile "BookParameters"     "BookParameters.tex"
+    requireFile "Book LaTeX"         "book.tex"
+    requireFile "eBook LaTex"        "eBook.tex"
+    requireDir  "tex"
+    requireDir  "bin"
+    requireDir  "images"
+    if [[ -d "cover" ]]; then
+        fail "Cover directory already exists. Delete it first."
+    fi
+    installCover
+    qecho "- Done."
+    exit 0
+}
+
+OPTIND=1 # Reset in case getopts has been used previously in the shell.
+while getopts "h?gvqtd:" opt; do
+    case "$opt" in
+        h|\?)
+            scriptUsage
+            exit 0
+            ;;
+        g)  useGit=1
+            ;;
+        v)  verbose=1
+            ;;
+        q)  quiet=1
+            ;;
+        t)  trialRun=1
+            ;;
+        d)  dirArg "$OPTARG"; fromDir="$rv"
+            ;;            
+    esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+main "$1" "$2"
+# - End of bash script.
+

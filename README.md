@@ -102,8 +102,8 @@ but these are not terribly professional looking and cannot be used with
 other printers. 
 I use my 
 [Github latex-createspace-bookcover](https://github.com/jfogarty/latex-createspace-bookcover)
-project. The best way to use this is to clone that project and merge its
-`cover`, `bin`, and `images` directories into this one.
+project. The best way to get this is to run `./bin/installcover -g`, which
+will fetch it from github and install it in this directory.
 
 When you build the book PDF with `./bin/makebook`, it runs `setBookTotalPageCount`
 against the LaTeX log to set the page count in `BookParameters.tex` for
