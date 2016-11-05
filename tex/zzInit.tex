@@ -352,6 +352,16 @@
     \end{tabular} 
     \end{center}
     }
+   
+%%---------------------------------------------------------------------
+%% Set running headings at to of pages.
+\newcommand{\RightRunningHeads}[1]{\renewcommand\rightmark{#1}}
+\newcommand{\LeftRunningHeads}[1]{\renewcommand\leftmark{#1}}
+
+\newcommand{\RunningHeads}[1]{
+    \LeftRunningHeads{#1}%
+    \RightRunningHeads{#1}%
+}
 
 %%--------------------------------------------------------------------
 %% \noparskip in paragraph to suppress blank line after this one.

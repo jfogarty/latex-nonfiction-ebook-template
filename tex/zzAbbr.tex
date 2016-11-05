@@ -278,13 +278,16 @@ interface between the brain's motor and non-motor (cognitive and limbic) circuit
 %%---------------------------------------------------------------------
 %% Produce the tables of Abbreviations, Acronyms, and Terms.
 \newcommand{\PrintAcronyms}[1][]{
-	\printacronyms[name=All Abbreviations and Terms]
+  \RunningHeads{Abbreviations and Terms}
+  \printacronyms[name=All Abbreviations and Terms]
 
-	\printacronyms[include-classes=nomencl,name=Nomenclature]
+  \printacronyms[include-classes=nomencl,name=Nomenclature]
 
-	\printacronyms[include-classes=aiabbrev,name=Abbreviations (Computation)]
-
-	\printacronyms[include-classes=nsabbrev,name=Abbreviations (Neuroscience)]
+  \RightRunningHeads{Abbreviations (Computation)}
+  \printacronyms[include-classes=aiabbrev,name=Abbreviations (Computation)]
+  
+  \RightRunningHeads{Abbreviations (Neuroscience)}
+  \printacronyms[include-classes=nsabbrev,name=Abbreviations (Neuroscience)]
 }
 
 %%---------------------------------------------------------------------
