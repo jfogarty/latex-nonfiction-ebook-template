@@ -92,5 +92,6 @@ diagrams/JF*
 *.xbb
 *.zip
 *.jf.txt
+rebuild.bash
 
 !eBookEntry.html

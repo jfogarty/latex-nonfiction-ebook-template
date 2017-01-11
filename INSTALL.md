@@ -14,14 +14,16 @@ These tools expect a **bash** commmand line environment as found on most
 Linux distributions. Windows and Mac users will may need to do additional
 configuration for these.
 
-**perl**, **java**, **sed**, **stat**, **mkdir**, **rm**, **cp** 
+**perl**, **python**, **java**, **sed**, **stat**, **mkdir**, **rm**, **cp** 
 must all be available from the command line and work as expected.
 
-- LaTeX TexLive 2016
-- TeXstudio LaTeX editor
-- Calibre eBook Manager
-- ePubCheck
-- Pinta Graphics Editor
+- LaTeX TexLive 2016 : Command line tools to build LaTeX documents
+- TeXstudio LaTeX editor : GUI for editing LaTeX documents
+- Calibre eBook Manager : GUI for editing and managing ebooks
+- ePubCheck : Java based .epub file validity checker
+- Pinta : Graphics Editor
+- GIMP : GNU Image Manipulation Program
+- ebb : MikTeX image bounding box extractor 
 
 #### LaTeX TeXLive 2016
 
@@ -129,11 +131,45 @@ Verify the install with:
 
 You will need a good graphics editor for manipulating many images. I mostly
 use [Pinta](https://pinta-project.com/pintaproject/pinta/) for simple things
-like resizing, format conversion, grayscale. For more complex edits, I use
-[Gimp](https://www.gimp.org/).
+like resizing, format conversion, grayscale. 
 
+Pinta is a GUI only application, although you can start it from the command
+line with:
 
-## Common Installation Issues
+```
+    $ which pinta
+        /usr/bin/pinta
+    $ pinta
+```
+
+#### GIMP - GNU Image Manipulation Program
+
+[Gimp](https://www.gimp.org/) is used to convert images from color to
+grayscale in `makebook`, and is a much more powerful tool than Pinta
+(although it is corresponding more complex, with a significant learning curve).
+
+Verify the install with:
+
+```
+    $ which gimp
+        /usr/bin/gimp
+    $ gimp --version
+        GNU Image Manipulation Program version 2.8.10
+```
+
+#### ebb - Bounding Box Extractor 
+
+Ebb is used to create .xbb files which describe the size of images when
+building LaTeX for HTML. 
+
+```
+    $ which ebb
+        ebb: /usr/bin/ebb
+    $ ebb --version
+        This is ebb Version 20160307
+```    
+
+## Common Installation and Runtime Issues
 
 #### Undefined control sequence - pgfsys@svg@newline -- Hnewline.fix
 
@@ -180,7 +216,7 @@ Follow [these instructions](http://tex.stackexchange.com/questions/43772/latex-x
 I used `dvipng` at a higher resolution which is part of the linux TeXlive
 distribution.
 
-#### Replacing Poor Resolution Equations With Your Own Images
+### Replacing Poor Resolution Equations With Your Own Images
 
 PdfLaTeX typesetting of math works fine, but htlatex does a poor job 
 when aligning maths and often generates bad html to boot. Using images
@@ -197,4 +233,73 @@ Make sure to capture the entire text (not page) width (about 1730 pixels).
 Save each equation as a `.png` file into the `./images/equations` directory.
 This makes a nice size for the image in the ePub PDF file. 
 
+### GIMP Hangs in Makebook 
 
+`makebook` uses GIMP scripting to do conversion of images to grayscale. 
+It is strangely senstive to image metadata and will hang whenever it gets
+an image it doesn't like. You should manually convert questionable images
+to their `imageName_BW.png` or `imageName_BW.jpg` versions using Pinta.
+
+Verify the `ebb` Bounding Box Extractor is installed. 
+
+### Ebb Missing or Fails on Windows
+
+The `ebb` Bounding Box Extractor is part of MiKTeX on Windows. If it doesn't exist then your LaTeX install is messed up. This seems to happen on Windows a lot (which I don't even try to support). This link may help: http://www.fastfixerror.com/whats-ebb-exe-how-to-fix-it-is-it-a-virus.html
+
+### Odd Command Errors
+
+If you have strange things happening with the scripts, its often because some
+fundamental command is missing or the path finds some other program of the
+same name that does something completely different. Here are the paths for
+the required commands on my system. Yours will of course be different, but
+it shouldn't be too hard to see if something is fubar.
+
+```
+    $ which which
+        /usr/bin/which
+        
+    $ whereis whereis
+        whereis: /usr/bin/whereis /usr/bin/X11/whereis /usr/share/man/man1/whereis.1.gz
+    $ which whereis
+        /usr/bin/whereis
+
+    $ which sed
+        /bin/sed
+    $ whereis sed
+        sed: /bin/sed /usr/share/man/man1/sed.1.gz
+
+    $ which stat
+        /bin/stat
+    $ whereis stat
+        stat: /usr/bin/stat /usr/bin/X11/stat /usr/share/man/man1/stat.1.gz /usr/share/man/man2/stat.2.gz
+
+    $ which mkdir
+        /bin/mkdir
+    $ whereis mkdir
+        mkdir: /bin/mkdir /usr/share/man/man1/mkdir.1.gz /usr/share/man/man2/mkdir.2.gz
+
+    $ which rm
+        /bin/rm
+    $ whereis rm
+        rm: /bin/rm /usr/share/man/man1/rm.1.gz
+
+    $ which cp
+        /bin/cp
+    $ whereis cp
+        cp: /bin/cp /usr/share/man/man1/cp.1.gz
+ 
+    $ which perl
+        /usr/bin/perl
+    $ whereis perl
+        perl: /usr/bin/perl /etc/perl /usr/lib/perl /usr/bin/X11/perl /usr/share/perl /usr/share/man/man1/perl.1.gz
+
+    $ which python
+        /usr/bin/python
+    $ whereis python
+        python: /usr/bin/python3.4m /usr/bin/python3.4 /usr/bin/python /usr/bin/python2.7 /etc/python3.4 /etc/python /etc/python2.7 /usr/lib/python2.6 /usr/lib/python3.4 /usr/lib/python2.7 /usr/bin/X11/python3.4m /usr/bin/X11/python3.4 /usr/bin/X11/python /usr/bin/X11/python2.7 /usr/local/lib/python3.4 /usr/local/lib/python2.7 /usr/include/python3.4m /usr/include/python2.7 /usr/share/python /usr/share/man/man1/python.1.gz
+
+    $ which java
+        /usr/lib/jvm/java-7-openjdk-amd64/bin/java
+    $ whereis java
+        java: /usr/bin/java /usr/bin/X11/java /usr/share/java /usr/share/man/man1/java.1.gz
+```
