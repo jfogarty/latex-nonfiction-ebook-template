@@ -124,9 +124,10 @@ function cleanDir()
 {
     local bookName=$1
     local -a exts=(
-       "4ct" "4dx" "4ix" "4tc" "ain" "aux" "aux.blg" "bbl" "bcf" "blg" 
+       "4ct" "4dx" "4ix" "4tc" "ain"  "aux" "aux.blg"   "bbl" "bcf" "blg"
        "css" "dvi" "ent" "enx" "html" "idv" "idx" "ilg" "ind" "lg"
-       "lof" "log" "lot" "ncx" "old" "out" "rtf" "run.xml" "synctex.gz" 
+       "lof" "log" "los" "lot" "ncx"  "old" "out" "rtf" "run.xml" 
+       "synctex.gz" 
        "tmp" "toc" "xref" "xwm")
     if [[ -e "$bookName.tex" ]]; then
       for i in "${exts[@]}"; do

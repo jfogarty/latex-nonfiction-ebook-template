@@ -17,7 +17,8 @@
 % -- Createspace: page count MUST be divisible by 2.
 % -- Ingram: page count MUST be divisible by 2.
 % -- Blurb : page count MUST be divisible by 6.
-\pgfmathsetmacro\TotalPageCount{31}% Must be manually entered
+% Add blank pages as needed in final PDF generations!
+\pgfmathsetmacro\TotalPageCount{33}% Must be manually entered
 \pgfmathsetmacro\PaperWidthPt{6in}%
 \pgfmathsetmacro\PaperHeightPt{9in}%
 
@@ -25,11 +26,14 @@
 
 \def\TheMainTitle{The Ultimate Book}
 \def\TheSubTitle{Hey! Why Not Read This One?}
+\def\TheSubTitleA{Hey!}
+\def\TheSubTitleB{Why Not Read This One?}
 \def\TheBookSeries{Books That Are Really Odd Series}
 
 \def\TheAuthor{Wilson J. Schmeggles}
+\def\TheAuthorA{Wilson J.}
+\def\TheAuthorB{Schmeggles}
 \def\TheAuthorLNF{Schmeggles, Wilson, J.}
-
 
 \def\TheCopyrightYear{2017}
 \def\TheEdition{First Edition}
@@ -53,31 +57,60 @@
 % NOTE Each version of a book usually requires its own ISBN. You can
 % obtain blocks of 10 ISBNs for $250 from https://www.myidentifiers.com/
 % You must know you Imprint Name (publisher). 
-\def\PrintISBN{978-4444444446}% 
-\def\PrintISBNShort{4444444444}%
-\def\EbookISBN{978-5555555557}%
-\def\EbookISBNShort{5555555555}%
+% Dashes MUST be placed in the correct postions in the ISBNs.
+\def\PrintISBN{978-4-4444444-4-6}% 
+\def\PrintISBNShort{4-4444444-4-9}%
+%\def\HardcoverISBN{978-4-4444444-4-6}%
+%\def\HardcoverISBNShort{4-4444444-4-9}%  
+\def\EbookISBN{978-5-5555555-5-7}%
+\def\EbookISBNShort{5-5555555-5-9}%
 
 %% ----------------------------------------------------------------------------
-% NOTE that the following are not valid until acquired from either
-% a publisher or the Library of Congress. Self-publishers should
-% contact http://www.quality-books.com/pcip.htm
-% The LCCN usually costs $100 and cannot be obtained until most of
-% a first draft is available as a text file.
+% The ISBN barcode is created with the GhostScript barcode.ps generator:
+% see Terry Burton's PostScript % based barcode generator, at: 
+%       https://github.com/bwipp/postscriptbarcode.
+% Use 99.99 if your price exceeds $100 (good luck selling that puppy).
+% Comment out these entries if you don't want a price in the barcode.
+\def\PrintPrice{9.95}% Price in dollars and cents for barcode.
+%\def\HardcoverPrice{19.95}% Price in dollars and cents for barcode.
+
+%% ----------------------------------------------------------------------------
+% NOTE that P-CIP (Publisher's Catalog in Publication) data block must be
+% aquired from http://www.quality-books.com/pcip.htm. This is placed on the
+% copyright page, and is required by all libraries and many booksellers.
+% The P-CIP costs $100 and cannot be obtained until much of a first draft
+% is available as an ASCII text file. 
+%
+% Only US Publishers (not independent or self), can obtain an LC-CIP
+% (Library of Congress Catalog in Publication) data block directly from 
+% the Library of Congress.
+\def\TheCIPType{Publisher's Cataloging-in-Publication Data}
+%\def\TheCIPType{Library of Congress Cataloging-in-Publication Data}
+
 % Library of Congress Catalog Subject Headings
 \def\TheCIPSubjectHeadings{1. Get from QualityBooks}
-
-% Library of Congress classification number (also Control Number)
-\def\TheLCCN{QP333.K33 2017}
 
 % Dewey Decimal System classification number
 \def\TheDDSN{333.33-dc33}
 
-% Library of Congress’ Preassigned Control Number (PCN)
+% LCCN: Library of Congress classification number (not a Control Number or PCN)
+\def\TheLCCN{QP333.K33 2017}
+
+%% ----------------------------------------------------------------------------
+% The PCN (also called an LCCN) are acquired from the Library of Congress.
+% This is done by contacting: http://www.loc.gov/publish/pcn/newaccount.html
+% after you have purchased an ISBN (13 digit) from Bowker, preferably for both
+% your print and eBook versions.
+
+% PCN: Library of Congress’ Preassigned Control Number (PCN)
+% Also called : Library of Congress Control Number
+% Also called : Library of Congress Card Number
+%
+% This takes about a day to get assigned and is free.
 \def\TheLCPCN{2017xxxxxx}
 
 %% ----------------------------------------------------------------------------
-\def\TheCopyrightKeywords{1. Artificial intelligence; 2. Cognitive neuroscience}
+\def\TheCopyrightKeywords{1. History; 2. Nonsense; 3. Made up stuff}
 
 \def\ShortDescription{% Normally restricted to 300 t0 350 characters depending on publisher.
 \textsf{\textbf{World War II and the Manhattan Project} -- a group of Hungarian scientists that included émigré physicist Leó Szilárd attempted to alert Washington.}}

@@ -1,0 +1,322 @@
+#!/bin/bash
+# Make a grayscale image for all files in a directory.
+# ----------------------------------------------------------------------------
+# LaTeX eBook utility tools
+# -----------------------------------------------------------------------------
+# John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
+# -----------------------------------------------------------------------------
+
+declare fullScriptName=$_
+declare scriptName=$(basename $0)
+
+declare doAll=0
+declare trialRun=0
+declare verbose=0
+declare quiet=0
+declare logindex=1
+declare force=0
+declare useGimp=1
+declare rv
+
+declare suffix='_BW'
+
+#------------------------------------------------------------------------
+# Terminate the script with a failure message.
+
+# echo text if not quiet
+function qecho()
+{
+    if [[ $quiet -eq 0 ]]; then
+        echo "$@"
+    fi
+}
+
+# echo text if in verbose mode.
+function vecho()
+{
+    if [[ $verbose -eq 1 ]]; then
+        echo "$@"
+    fi
+}
+
+function fail()
+{
+    local msg=$1
+    qecho "[$scriptName] *** Failed: $msg"
+    exit 666
+}
+
+function requireFile()
+{
+	local fileType=$1
+	local fileName=$2
+    if [[ ! -e "$fileName" ]]; then
+        fail "$fileType input file '$fileName' does not exist"
+    fi
+}
+
+function checkDir()
+{
+	local dirName=$1
+	local fileName=$2
+    if [[ -e "$dirName" ]]; then
+        local toFile="$dirName/$fileName"
+        if ! [[ -e "$toFile" ]]; then
+            echo "*** Suspicious target directory. Clear it yourself first."
+            fail "$toFile should exist."
+        fi
+    fi
+}
+
+#------------------------------------------------------------------------
+# Run a command and exit if any error code is returned.
+function run()
+{
+    if [[ $trialRun != 0 ]]; then
+        echo "--Run:[$@]"
+    else
+       if [[ $verbose == 1 ]]; then
+           echo "- $@"
+       fi
+       eval "$@"
+       local status=$?
+       if [[ $status -ne 0 ]]; then
+           echo "[$scriptName] *** Error with [$1]" >&2
+           exit $status
+       fi
+       return $status
+    fi
+}
+
+#------------------------------------------------------------------------
+# Remove a specified extension from a filename if its present.
+# Return resulting file in rv.
+function removeExtension()
+{
+    local fileName=$1
+    local extName=$2
+    if [[ "${fileName%.*}.$extName" == "$fileName" ]]; then
+        fileName=${fileName%.*}
+    fi
+    if [[ "${fileName%.*}." == "$fileName" ]]; then
+        fileName=${fileName%.*}
+    fi
+    rv="$fileName"
+}
+
+#------------------------------------------------------------------------
+# Strip : and = from argument text
+function dirArg()
+{
+    local dirName=$1
+    if [[ ${dirName:0:1} == ":" ]] ; then
+        dirName=${dirName:1}
+    fi
+    if [[ "${dirName:0:1}" == "=" ]] ; then
+        dirName=${dirName:1}
+    fi
+    rv="$dirName"
+}
+
+#------------------------------------------------------------------------
+# Copy files to the target directory conversion (after clearing it)
+function copyIfExists()
+{
+    local theFile=$1
+    local theDest=$2
+    if [[ -e "$theFile" ]]; then
+        run "cp \"$theFile\" \"$theDest\""
+    fi
+}
+
+#------------------------------------------------------------------------
+# Delete a file if it exists
+function delIfExists()
+{
+    local theFile=$1
+    if [[ -e "$theFile" ]]; then
+        run "rm \"$theFile\""
+    fi
+}
+
+#------------------------------------------------------------------------
+# Return 1 if a string ends with something else.
+function endsWith()
+{
+    local theString="$1"
+    local theEnding="$2"
+    echo "$theString" | grep -q "${theEnding}$";
+    rv=$?
+    return $rv
+}
+
+#------------------------------------------------------------------------
+# Convert an image file to grayscale.
+function imageMagickConvertToGrayscale()
+{
+    local inFile=$1
+    local outFile=$2
+    local type=$3
+    local parms="-colorspace Gray -separate -average"
+    if [[ "$type" == "png" ]]; then
+        parms="-background white -alpha remove $parms "
+    fi
+    run "convert \"$inFile\" $parms \"$outFile\""
+}
+
+#------------------------------------------------------------------------
+# Convert an image file to grayscale using GIMP
+# - Note that Gimp produces a much nicer looking grayscale image
+# but it is buggy and sensitive to metadata corruction problems.
+# Every failure is a hang that requires termination by killing the
+# GIMP process. Not too swift.
+function gimpConvertToGrayscale()
+{
+    local inFile=$1
+    local outFile=$2
+    local type=$3
+    local gimp="gimp -c -i -d -b \""
+    if [[ "$type" == "png" ]]; then
+        gimp="$gimp"' (let* ((image (car (file-png-load 1 \"'$inFile'\" \"'$inFile'\"))) (drawable (car (gimp-image-active-drawable image)))) (gimp-convert-grayscale image) (file-png-save 1 image drawable \"'$outFile'\" \"'$outFile'\"'
+        gimp="$gimp"' 1 0 0 0 0 0 0 ))'
+            # 1 Adam7 interlacing?
+            #   0 deflate compression factor (0-9)
+            #     0 Write bKGD chunk?
+            #       0 Write gAMMA chunk?
+            #         0 Write oFFs chunk?
+            #           0 Write tIME chunk?    ?? backwards in DB Browser
+            #             0 Write pHYS chunk?  ?? backwards in DB Browser        
+    else
+        gimp="$gimp"' (let* ((image (car (file-jpeg-load 1 \"'$inFile'\" \"'$inFile'\"))) (drawable (car (gimp-image-active-drawable image)))) (gimp-convert-grayscale image) (file-jpeg-save 1 image drawable \"'$outFile'\" \"'$outFile'\"'
+        gimp="$gimp"' 0.85 0 1 1 \"GIMP\" 0 1 0 0 ))'
+            # 0.75 quality (float 0 <= x <= 1)
+            #      0 smoothing factor (0 <= x <= 1)
+            #        1 optimization of entropy encoding parameter (0/1)
+            #          1 enable progressive jpeg image loading (0/1)
+            #            "xxxx"  image comment
+            #                   0 subsampling option number
+            #                     1 force creation of a baseline JPEG
+            #                       0 frequency of restart markers 
+            #                         in rows, 0 = no restart markers
+            #                         0 DCT algoritm to use          
+    fi
+    gimp="$gimp"' (gimp-quit 0)"'
+    run $gimp
+       
+#  gimp -c -i -d -b "(let* ((image (car (file-png-load 1 \"x.png\" \"x.png\"))) (drawable (car (gimp-image-active-drawable image)))) (gimp-convert-grayscale image) (file-png-save 1 image drawable \"x-gray.png\" \"x-gray.png\" 1 0 0 0 0 0 0 )) (gimp-quit 0)"
+}
+
+#------------------------------------------------------------------------
+# Convert an image file to grayscale using ImageMagick's CONVERT
+# Produces an image that is often too dark. Interactive Pinta or
+# GIMP do much better jobs.
+function convertToGrayscale()
+{
+    local inFile=$1
+    local outFile=$2
+    local type=$3
+    if [[ $force -eq 1 ]]; then
+        delIfExists "$outFile"
+    fi
+    if [[ -e "$outFile" ]]; then
+        vecho "- Already converted: $inFile"
+    else
+        qecho "- Converting to grayscale: $theFile"
+        if [[ $useGimp -eq 1 ]]; then
+            gimpConvertToGrayscale "$inFile" "$outFile" "$type"
+        else
+            imageMagickConvertToGrayscale "$inFile" "$outFile" "$type"
+        fi
+    fi
+}
+
+#------------------------------------------------------------------------
+# Convert a file to grayscale if no $suffix version exists.
+function convertImage()
+{
+    local theFile=$1
+    local ext="${theFile##*.}"
+    local fn="${theFile%.*}"
+    endsWith "$fn" "$suffix"
+    if [[ $rv -eq 0 ]]; then
+       vecho "- Skipping grayscale image: $theFile"
+    else
+
+       convertToGrayscale "$theFile" "$fn$suffix.$ext" "$ext"
+    fi
+}
+
+#------------------------------------------------------------------------
+# Selectively delete book files from the directory
+function convertImages()
+{
+    local dirName=$1
+    cd $dirName
+    for file in `(cat <(ls *.jpg) <(ls *.png) | sort -f)` ; do
+        convertImage "$file"
+    done
+}
+
+#------------------------------------------------------------------------
+function scriptUsage()
+{
+    echo "Usage: $scriptName [dir]"
+    echo "Create grayscale [$suffix] images from existing ones."
+    echo ""
+    echo "  -a     use image directory as default."
+    echo "  -f     force - deletes old [$suffix] files."
+    echo "  -t     trial run -- commands are shown but not executed."
+    echo "  -q     quiet output during command execution."
+    echo "  -m     use ImageMagic for convert (fast but not good)"
+    echo "  -v     verbose output during command execution."
+    echo ""
+    echo "Existing [$suffix] images are ignored unless -f is used."
+    echo "*WARNING* Using -f will destroy manually adjusted grayscale"
+    echo "images, which is generally a BAD idea".
+    echo ""	
+    exit 1
+}
+
+#------------------------------------------------------------------------
+function main()
+{
+    local dirName=$1 
+    if [[ -z "$1" ]]; then
+        if [[ $doAll -eq 0 ]]; then
+            scriptUsage 
+        else
+            dirName="images"
+        fi
+    fi
+    convertImages "$dirName"
+    vecho "- Done."
+    exit 0
+}
+
+OPTIND=1 # Reset in case getopts has been used previously in the shell.
+while getopts "h?fvqmta" opt; do
+    case "$opt" in
+        h|\?)
+            scriptUsage
+            exit 0
+            ;;
+        f)  force=1
+            ;;            
+        a)  doAll=1
+            ;;            
+        v)  verbose=1
+            ;;
+        q)  quiet=1
+            ;;
+        m)  useGimp=0
+            ;;
+        t)  trialRun=1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+main "$@"
+
+# - End of bash script.
+

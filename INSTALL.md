@@ -96,7 +96,7 @@ Verify the install with:
   $ which calibre
       /usr/bin/calibre
   $ calibre --version
-      calibre (calibre 2.66)
+      calibre (calibre 2.72)
 ```
 
 #### ePubCheck
@@ -179,3 +179,22 @@ Follow [these instructions](http://tex.stackexchange.com/questions/43772/latex-x
 
 I used `dvipng` at a higher resolution which is part of the linux TeXlive
 distribution.
+
+#### Replacing Poor Resolution Equations With Your Own Images
+
+PdfLaTeX typesetting of math works fine, but htlatex does a poor job 
+when aligning maths and often generates bad html to boot. Using images
+for equations is now my preferred option. 
+
+It's quite easy to wrapper your equations with the `\BookMath` command
+which will look for an image when you are generating HTML or eBooks.  
+
+The workaround is to format for book, and then display the PDF at 400% with
+Okular. Then place a selection box around each equation, leaving
+about a half character of whitespace top and bottom. 
+Make sure to capture the entire text (not page) width (about 1730 pixels).
+
+Save each equation as a `.png` file into the `./images/equations` directory.
+This makes a nice size for the image in the ePub PDF file. 
+
+

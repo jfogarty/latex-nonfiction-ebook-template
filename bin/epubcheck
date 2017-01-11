@@ -5,12 +5,9 @@
 # -----------------------------------------------------------------------------
 # John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
 # -----------------------------------------------------------------------------
-declare absScriptFile=$(readlink -f "$0")
-declare absScriptPath=$(dirname "$absScriptFile")
-
 function main()
 {
-    local jar=$HOME/LaTeX/epubcheck/target/epubcheck.jar
+    jar=$HOME/LaTeX/epubcheck/target/epubcheck.jar
     if [[ -e "$jar" ]]; then
         exec java -jar $jar "$@"
     else

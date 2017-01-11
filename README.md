@@ -136,12 +136,14 @@ You will need to manually edit these values, but rarely.
 - TheKeywords: {Yadas, Books, Odd, Wierd}
 - PrintISBN: The 13 digit ISBN. Get from Bowker. 
 - PrintISBNShort: The 10 digit ISBN. Get from Bowker. 
+- HardcoverISBN: Optional for your hardback version. Get from Bowker.
+- HardcoverISBNShort  
 - EbookISBN: The ebook ISBN, if you need one.
 - EbookISBNShort: The short version of the above.
 - TheCIPSubjectHeadings: Library of Congress Catalog Subject Headings. Get from QualityBooks
-- TheLCCN: Library of Congress classification number (also Control Number)
+- TheLCCN: Library of Congress classification number (NOT a Control Number)
 - TheDDSN: Dewey Decimal System classification number
-- TheLCPCN: Library of Congress’ Preassigned Control Number (PCN)
+- TheLCPCN: Library of Congress’ Preassigned Control Number (PCN) (also called an LCCN) are acquired from the Library of Congress. This is done by contacting: http://www.loc.gov/publish/pcn/newaccount.html after you have purchased an ISBNs from Bowker, preferably for all your print and eBook versions.
 - TheCopyrightKeywords: Obtain from QualityBooks
 - ShortDescription: Normally restricted to 300 t0 350 characters depending on publisher.
 - BackDescription: Typically max 2000-4000 characters
@@ -192,20 +194,20 @@ Your image files should be referenced with the \Image or \IMAGE
 command forms. 
 
 ```tex
-    \Image[options]{filebase}{type}
+    \Image[options]{filebase}
 ```
 The [options] are just passed to **\includegraphics**.
 
-{filebase} is the filename without the extension. You should create a {filebase}_BW.{type} variations for every image rather than sending color images to your printer.
+{filebase} is the filename without the extension. You should create a {filebase}_BW.jpg or .png variation for every image rather than sending color images to your printer.
 
-{type} should be **jpg** or **png** to be compatible with all eBook forms.
-Do not use **gif** or multi-media image formats.
+You don't need to specify the file type, but it must be be **jpg** or **png** to be compatible with all eBook forms.
+Do not use **gif**, **svg** or multi-media image formats, or you'll get nasty surprises depending on the format you are using.
 
 ```tex
     \IMAGE[options]{filename}
 ```
 
-Like **\Image**, but the entire filename is provided. All image files must be in the `../images` subdirectory, but you may add further subdirectories within it.
+Like **\Image**, but the exact filename is provided. All image files must be in the `../images` subdirectory, but you may add further subdirectories within it.
 
 #### Nomenclature and Abbreviations
 
@@ -350,6 +352,9 @@ resolve using the editor. Sorry, but that's how it is at this point.
 A .mobi can be generated directly, but this is just useful as a draft.
 You need to edit the .epub file with a good ePub editor such as [Calibre](http://calibre-ebook.com/) which can then be used to generate the .mobi.
 
+Calibre can also be used to generate Kindle only **AZW3** formatted books, 
+which are essentially just highly compressed versions of mobi with DRM.
+
 
 ### Format: Html Single Page Website
 
@@ -374,7 +379,7 @@ to use other printers, but you may decide to save the bucks.
 
 Once you have your ISBNs, modify the `BookParameters.tex` fields, **PrintISBN**,
 **PrintISBNShort**, **EbookISBN**, and **EbookISBNShort**. 13 digit ISBN numbers
-can be converted to 10 digit an vice versa using [this tool](http://pcn.loc.gov/isbncnvt.html).  
+can be converted to 10 digit and vice versa using [this tool](http://pcn.loc.gov/isbncnvt.html).  
 
 
 # Utility Programs

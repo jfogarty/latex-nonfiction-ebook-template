@@ -1,18 +1,17 @@
 %% ----------------------------------------------------------------------------
-%% Paperback Book - [Your Book Name Here] - MASTER LaTeX File
+%% Printed Book - [Your Book Name Here] - MASTER LaTeX File
 % -----------------------------------------------------------------------------
-% Copyright 2016 [your name] - All rights reserved.
+% Copyright 2017 [your name] - All rights reserved.
 % 
-% This is the KOMA-Script LaTeX version of this work. 
-% It is designed to be formatted as either a PDF for direct reading,
-% or as PDF for distribution to a printer as a 6"x9" paperback book.
+% This is the KOMA-Script LaTeX version of this work. This is designed to 
+% be formatted as a PDF for distribution to a POD printer as a 6"x9" book.
+% This can also be useful to typeset a hyperlinked PDF for direct reading.
 %
-% Note: the ./cover subdirectory contains LaTeX for formatting the
-% printed cover. The TotalPageCount of BookParameters.tex must be
-% adjusted before the cover PDFs are generated.
+% Note: the ./cover subdirectory contains LaTeX for formatting the color
+% printed cover. The TotalPageCount of BookParameters.tex is set by running
+% the makebook script based on info in the LaTeX log file.
 %
-% Use the ./bin/makebook script to convert the book to PDFs and
-% other formats to avoid leaving out steps.
+% Use the ./bin/makebook script to generate the various book formats. 
 % -----------------------------------------------------------------------------
 \documentclass[        % KOMA-Script Book Formatting
   twoside=true,
@@ -45,36 +44,43 @@
 %% The default for producing the article form PDF should be: All options false.
 %% Note: F11, Shift-Alt-F1, F1, F12, F1, F1 (Bibliography, Reauthor, Reindex,
 %%       and PDFLatex twice after changing)
-
-\Boolean{ISBOOK}       {true}   % This is formatted as a book
+%% Sometimes all files except .tex and .bib need to be deleted to prevent
+%% build errors.
+%% Setting NOINDEX parameteter, then F1, F12, then unset NOINDEX may help.
+%%
+\Boolean{ISBOOK}      {true}   % This is formatted as a book
  
-\Boolean{FINALFORM}    {no}     % Ready for publication
-\Boolean{EDITMODE}     {no}     % Editing mode (double spaced)
+\Boolean{FINALFORM}   {false}  % Ready for publication
+\Boolean{EDITMODE}    {no}     % Editing mode (double spaced)
 
-% Watermarks are NOT applicable to KOMA script books like this one.
-\Boolean{WATERMARK}    {false}  % Not applicable to this version
+% Warning. Watermarks generate errors, but the doc still builds.
+\Boolean{WATERMARK}   {false}  % Place a watermark on the text (SLOW)
 
-\Boolean{TOHTML}       {no}     % Format for Tex4HT conversion
-\Boolean{TOMOBI}       {no}     % Extra Formatting for Kindle .MOBI
-\Boolean{TOEPUB}       {no}     % Extra Formatting for IDPF .EPUB
-\Boolean{RAWHTML}      {no}     % Allow /HCode directly in text [no PDF]
+\Boolean{TOHTML}      {no}   % Format for Tex4HT conversion
+\Boolean{TOMOBI}      {no}     % Extra Formatting for Kindle .MOBI
+\Boolean{TOEPUB}      {no}     % Extra Formatting for IDPF .EPUB
+\Boolean{RAWHTML}     {no}     % Allow /HCode directly in text [no PDF]
 
-\Boolean{TOPRESS}      {true}     % Format for paper printing
-\Boolean{NOCOLOR}      {no}     % Format for monochrome output
+\Boolean{TOPRESS}     {false}  % Format for paper printing
+\Boolean{NOCOLOR}     {no}     % Format for monochrome output
 
-\Boolean{SUBCAPTIONS}  {true}   % Allow subcaptioned figures.
-\Boolean{PARENTIMAGES} {no}     % Images are in a parent directory.
+\Boolean{SUBCAPTIONS} {true}   % Allow subcaptioned figures.
+\Boolean{PARENTIMAGES}{false}  % Images are in a parent directory.
 
-\Boolean{CHAPTERNOTES} {no}     % Place endnotes at end of each chapter
-\Boolean{NOBODY}       {no}     % Incude only the intro [debugging]
-\Boolean{NOLISTS}      {no}     % Do not generate lists of figures and tables
-\Boolean{NOFIGLIST}    {no}     % Do not generate list of figures
-\Boolean{NOTABLIST}    {true}   % Do not generate list of tables
-\Boolean{NOINDEX}      {no}     % Do not generate index entries
-\Boolean{NOAUTHORS}    {no}     % Do not include the Authors section.
-\Boolean{NOHYPERREF}   {no}     % Disables hyperref - href linking.
-\Boolean{NOABBR}       {no}     % Suppress abbreviations.
-\Boolean{NOIMAGES}     {no}     % Disable Graphics inclusion
+\Boolean{CHAPTERNOTES}{no}     % Place endnotes at end of each chapter
+\Boolean{NOBODY}      {no}     % Incude only the intro [for debugging]
+\Boolean{NOLISTS}     {no}     % Do not generate lists of figures and tables
+\Boolean{NOFIGLIST}   {no}     % Do not generate list of figures
+\Boolean{NOFIGSRCS}   {no}     % Do not generate a list of figure sources
+\Boolean{NOTABLIST}   {true}   % Do not generate list of tables
+\Boolean{NOINDEX}     {no}     % Do not generate index entries
+\Boolean{NOAUTHORS}   {no}     % Do not include the Authors section
+\Boolean{NOHYPERREF}  {no}     % Disables hyperref - href linking
+\Boolean{NOABBR}      {no}     % Suppress abbreviations
+\Boolean{NOIMAGES}    {no}     % Disable Graphics inclusion [for debugging]
+
+\Boolean{ONECOLUMN}   {no}     % Use single column for indexes, authors, etc.
+\Boolean{IMAGEMATH}   {no}     % Use saved images for complex math expressions
 
 %% ----------------------------------------------------------------------------
 \advance\hoffset by -0.7 truein\relax
@@ -91,7 +97,26 @@
 
 \ifthenelse{\boolean{EDITMODE}}{\linespread{1.6}}{}
 
-\makeindex								% Enable \index commands
+\InitMakeIndex % Set up \index commands
+\makeindex     % Enable \index commands (oddly, must be at top level)
+  
+%------------------------------------------------------------------------------
+% KOMA-Script extended page formatting
+\ifthenelse{\boolean{FINALFORM}}{}{%
+	% Put nasty black marks next to HBOX too wide issues
+	\KOMAoptions{draft=true}
+}
+
+%\usepackage[automark,headsepline]{scrlayer-scrpage}
+\usepackage[automark]{scrlayer-scrpage}
+
+\deftripstyle{draftstyle}
+  {}                 % header left, middle, right
+  {}
+  {\headmark}
+  {\TheAuthor}       % footer left, middle, right 
+  {DRAFT:\today}
+  {\pagemark}
 
 %------------------------------------------------------------------------------
 %% Nomenclature and abbreviation commands
@@ -206,25 +231,43 @@
 %\setcounter{page}{499}% Set the page number
 \cleardoublepage\phantomsection%
 \addcontentsline{toc}{chapter}{Bibliography}%
-\bibliography{book}%
+\bibliography{tex/bib/book}%
 
+%% NOTE! Changing the bibliography style will cause massive reformatting of
+%% all of the text. You will need to check every page for bad box warnings:
+%% ()over/under full \hbox) lines. Don't do this lightly.
+%%
 %\bibliographystyle{apalike}    % Prime Author and year
 \bibliographystyle{plain}       % Just numbers
 
 %% ----------------------------------------------------------------------------
 %% Cited Authors
-\ifthenelse{\boolean{NOAUTHORS}}{}{%
-  \ifthenelse{\boolean{TOHTML}}{%
-    \renewcommand\indexspace{
-    }%
-  }{}%
+\PrintAuthorIndex
+
+%
+%% ----------------------------------------------------------------------------
+%% List of Figure Sources 
+\ifthenelse{\boolean{NOLISTS}}{}{%
   \cleardoublepage\phantomsection%
-  \RunningHeads{Authors Cited}
-  \chapter*{Authors Cited}%
-  \addcontentsline{toc}{chapter}{Authors Cited}%
-  \begin{multicols}{2}%
-	\printauthorindex%
-  \end{multicols}%
+  \ifthenelse{\boolean{NOFIGLIST}}{}{%
+    % List of Figure Sources (attributions)
+    \ifthenelse{\boolean{NOFIGSRCS}}{}{%
+      \newpage
+      \RunningHeads{FIGURE SOURCES}%
+      \addcontentsline{toc}{chapter}{List of Figure Sources}%
+      \listofsources
+      \noindent\textbf{Note}: Additional information on sources and attributions for illustrations and figures can be found online at 
+      \URL{http://YourBooksURL.com/}      
+    }
+  }
+}
+%
+%% ----------------------------------------------------------------------------
+%% Nomenclature, Terms, Abbreviations, Acronyms, and Glossary 
+\ifthenelse{\boolean{NOABBR}}{}{
+  \newpage
+  \addcontentsline{toc}{chapter}{Abbreviations and Terms}
+  \PrintAcronyms%
 }%
 %
 %% ----------------------------------------------------------------------------
@@ -234,16 +277,10 @@
   % \setcounter{page}{999} % Set the page number [debugging]
   \renewcommand{\indexname}{Index}%
   \addcontentsline{toc}{chapter}{The Index}%
+  \raggedright
   \PrintIndex% 
 }%
-%
-%% ----------------------------------------------------------------------------
-%% Nomenclature, Terms, Abbreviations, Acronyms, and Glossary 
-\ifthenelse{\boolean{NOABBR}}{}{
-  \cleardoublepage\phantomsection%
-  \addcontentsline{toc}{chapter}{Abbreviations and Terms}
-  \PrintAcronyms%
-}%
+\RunningHeads{}
 %
 %% ----------------------------------------------------------------------------
 %% Page of metrics and diagram about the physical and logical page format.
@@ -253,5 +290,11 @@
 	\pagediagram
 	\pagevalues
 \fi
+%%
+ ----------------------------------------------------------------------------
+\cleardoublepage\phantomsection%
+
+\typeout{\detokenize{\TRAP-LOG-MESSAGE}\{\TheAuthor message\}}.
 
 \end{document}
+

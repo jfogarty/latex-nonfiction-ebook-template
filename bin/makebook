@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build all versions of a book from LaTeX sources.
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # LaTeX eBook utility tools
 # -----------------------------------------------------------------------------
 # John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
@@ -25,6 +25,7 @@ declare quiet=0
 declare rv
 
 declare makeAll=0
+declare makeBoth=0
 declare makeCover=0
 declare makeBook=0
 declare makePdf=0
@@ -33,8 +34,11 @@ declare makeHtml=0
 declare makeEpub=0
 declare makeMobi=0
 declare noCover=0
+declare hardcover=0
+declare binDir=$(readlink -f './bin')
+declare clearScript=1
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Terminate the script with a failure message.
 
 # echo text if not quiet
@@ -53,10 +57,19 @@ function vecho()
     fi
 }
 
+function error()
+{
+    local msg=$1
+    qecho "[$scriptName] *** Error: $msg"
+    exit 666
+}
+
 function fail()
 {
     local msg=$1
     qecho "[$scriptName] *** Failed: $msg"
+    qecho "[$scriptName] This script is executing in the \"$(pwd)\" directory."
+    qecho "[$scriptName] Unfortunately, this is not a book directory, or its corrupted."
     exit 666
 }
 
@@ -82,7 +95,7 @@ function checkDir()
     fi
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Run a command and exit if any error code is returned.
 function runIgnore()
 {
@@ -94,7 +107,7 @@ function runIgnore()
     fi
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Run a command and exit if any error code is returned.
 function run()
 {
@@ -107,7 +120,7 @@ function run()
     return $status
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Remove a specified extension from a filename if its present.
 # Return resulting file in rv.
 function removeExtension()
@@ -123,7 +136,7 @@ function removeExtension()
     rv="$fileName"
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Strip : and = from argument text
 function dirArg()
 {
@@ -137,7 +150,7 @@ function dirArg()
     rv="$dirName"
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Copy files to the target directory conversion (after clearing it)
 function copyIfExists()
 {
@@ -145,6 +158,32 @@ function copyIfExists()
     local theDest=$2
     if [[ -e "$theFile" ]]; then
         run cp "$theFile" "$theDest"
+    fi
+}
+
+# Run a command with verbose, quiet, and optional deep Trial parameters.
+function vrun()
+{
+    local msg=$1
+    local cmd=$2
+    local parms=$3
+    local ignoreError=$4
+    qecho "------------------------------------------------------------------"
+    if [[ $deepTrialRun -ne 0 ]]; then
+        parms="-t $parms"
+    fi
+    if [[ $verbose -ne 0 ]]; then
+        parms="-v $parms"
+    fi       
+    if [[ $quiet -ne 0 ]]; then
+        parms="-q $parms"
+    fi     
+    local fullcmd="$cmd $parms"
+    qecho "- $msg"
+    if [[ ignoreError -eq 0 ]]; then
+        run "$fullcmd" 
+    else
+        runIgnore "$fullcmd" 
     fi
 }
 
@@ -161,6 +200,8 @@ function drun()
         parms="\"-d=$dirName\" $parms"
         msg="$msg (to $dirName)"
         run "rm -rf $dirName/*"
+    else
+        error "[$msg,$cmd] No directory name supplied to drun()"
     fi
     if [[ $deepTrialRun -ne 0 ]]; then
         parms="-t $parms"
@@ -179,14 +220,13 @@ function drun()
         runIgnore "$fullcmd" 
     fi
     
-    # Assuming the script sources a setParameters script, delete it so
-    # the next command can start fresh.
-    if [[ -e "$setParametersScript" ]]; then
-        run "rm $setParametersScript"
-    fi    
+    # Assuming the script sources a setParameters script, allow the next
+    # run to overwrite it so it starts fresh.
+    clearScript=1
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# Adds a parameter change to the parameter setting script run by toBookFormat
 function doSetBookBoolean()
 {
     local texFile="$1"
@@ -194,10 +234,14 @@ function doSetBookBoolean()
     local boolValue="$3"
     local theValue="false"
     local flags=""
+    if [[ $clearScript -eq 1 ]]; then
+        echo "# Set parameters for toBookFormat on $(date '+%Y-%m-%d %H:%M:%S')" > $setParametersScript
+        clearScript=0
+    fi
     if [[ $boolValue -eq 1 ]]; then
         theValue="true"
     fi
-    echo "setBookBoolean $flags \"$texFile\" $paramName $theValue" >> $setParametersScript
+    echo "$binDir/setBookBoolean $flags \"$texFile\" $paramName $theValue" >> $setParametersScript
 }
 
 function setFinalForm()
@@ -207,27 +251,40 @@ function setFinalForm()
 
 function makeBookVersions()
 {
+    local toFmt="$binDir/toBookFormat"
     local all="./all_"
     if [[ $finalForm -eq 1 ]]; then
         all="./final_"
     fi  
-
+    local hb
+    local toDir
+    if [[ $hardcover -eq 1 ]]; then hb="h"; fi
     if [[ $makeAll -eq 1 ]]; then 
         run "rm -rf ${all}*"
     fi
 
-
     if [[ $makeAll -eq 1 ]] || [[ $makeBook -eq 1 ]]; then
+        toDir="${all}${hb}book"
+        vrun "Generate missing grayscale images" "$binDir/makebwimages" '-a'
         setFinalForm     "book"
-        doSetBookBoolean "book" TOPRESS 1
-        doSetBookBoolean "book" NOCOLOR 1
-        drun "GENERATING BOOK"          "./bin/topdf" "${all}book" "book.tex"  0
-        run "setBookTotalPageCount ${all}book/logs/7_pdflatex.log"
+        doSetBookBoolean "book" TOPRESS  1
+        doSetBookBoolean "book" NOCOLOR  1
+        doSetBookBoolean "book" NOIMAGES 0
+        drun "GENERATING BOOK" "$toFmt --topdf" "$toDir" "book.tex"  0
+        run "$binDir/setBookTotalPageCount $toDir/logs/7_pdflatex.log"
     fi
 
     if [[ $makeAll -eq 1 ]] || [[ $makeBook -eq 1 ]] || [[ $makeCover -eq 1 ]]; then
         if [[ $noCover -eq 0 ]]; then
-            drun "GENERATING COVER"        "./bin/makecover" "" "" 0
+            if [[ $hardcover -eq 0 ]]; then
+                vrun "GENERATING COVER"        "$binDir/makecover" "" 0
+            else
+                vrun "GENERATING HARDCOVER"    "$binDir/makecover" "-g" 0
+            fi
+            # When building a book, place the corresponding cover in its dir.
+            if [[ -n "$toDir" ]]; then
+                run "cp Cover.pdf $toDir"
+            fi
         else
             qecho "- NO COVER AVAILABLE, see Github latex-createspace-bookcover"
         fi
@@ -237,45 +294,52 @@ function makeBookVersions()
         setFinalForm     "book"
         doSetBookBoolean "book" TOPRESS 0
         doSetBookBoolean "book" NOCOLOR 0
-        drun "GENERATING PDF"          "./bin/topdf"     "${all}pdf"   "book.tex"  0
+        drun "GENERATING PDF"          "$toFmt --topdf"    "${all}pdf"   "book.tex"  0
     fi
 
     if [[ $makeAll -eq 1 ]] || [[ $makeAscii -eq 1 ]]; then
-        drun "GENERATING ASCII DRAFT"  "./bin/toascii"   "${all}ascii" "book.tex"  0
+        setFinalForm     "book"    
+        doSetBookBoolean "book" ONECOLUMN 1
+        doSetBookBoolean "book" IMAGEMATH 1
+        doSetBookBoolean "book" NOIMAGES  1
+        drun "GENERATING ASCII DRAFT"  "$toFmt --totext"   "${all}ascii" "book.tex"  0
     fi
 
     if [[ $makeAll -eq 1 ]] || [[ $makeHtml -eq 1 ]]; then
         setFinalForm     "eBook"
-        doSetBookBoolean "eBook" TOHTML 1
-        doSetBookBoolean "eBook" TOEPUB 0
-        doSetBookBoolean "eBook" TOMOBI 0
-        drun "GENERATING HTML SITE"    "./bin/tohtml"    "${all}html"  "eBook.tex" 0
+        doSetBookBoolean "eBook" TOHTML  1
+        doSetBookBoolean "eBook" TOEPUB  0
+        doSetBookBoolean "eBook" TOMOBI  0
+        doSetBookBoolean "eBook" NOCOLOR 0
+        drun "GENERATING HTML SITE"    "$toFmt --tohtml"   "${all}html"  "eBook.tex" 0
     fi
 
     if [[ $makeAll -eq 1 ]] || [[ $makeEpub -eq 1 ]]; then
         setFinalForm     "eBook"
-        doSetBookBoolean "eBook" TOHTML 1
-        doSetBookBoolean "eBook" TOEPUB 1
-        doSetBookBoolean "eBook" TOMOBI 0
-        drun "GENERATING EBOOK"        "./bin/toepub"    "${all}epub"  "eBook.tex" 0
+        doSetBookBoolean "eBook" TOHTML  1
+        doSetBookBoolean "eBook" TOEPUB  1
+        doSetBookBoolean "eBook" TOMOBI  0
+        doSetBookBoolean "eBook" NOCOLOR 0
+        drun "GENERATING EBOOK"        "$toFmt --toebook"  "${all}epub"  "eBook.tex" 0
     fi
 
     if [[ $makeMobi -eq 1 ]]; then 
         setFinalForm     "eBook"
-        doSetBookBoolean "eBook" TOHTML 1
-        doSetBookBoolean "eBook" TOEPUB 0
-        doSetBookBoolean "eBook" TOMOBI 1
-        drun "GENERATING KINDLE DRAFT" "./bin/tomobi"    "${all}mobi"  "eBook.tex" 0
+        doSetBookBoolean "eBook" TOHTML  1
+        doSetBookBoolean "eBook" TOEPUB  0
+        doSetBookBoolean "eBook" TOMOBI  1
+        doSetBookBoolean "eBook" NOCOLOR 0
+        drun "GENERATING KINDLE DRAFT" "$toFmt --tokindle" "${all}mobi"  "eBook.tex" 0
     fi
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 function scriptUsage()
 {
-    echo "Usage: $scriptName [version(s)] [options]"
+    echo "Usage: $scriptName [version(s)] [options] [booktypes]"
     echo "Build some or all versions of a book"
     echo ""
-    echo "versions (more than one may be selected):"
+    echo "[versions] (more than one may be selected):"
     echo "  --book   : grayscale PDF formatted for a paperback book"
     echo "  --pdf    : color PDF with hyperlinks formatted for reading"
     echo "  --epub   : eBook .epub archive with epubcheck validation"
@@ -283,22 +347,26 @@ function scriptUsage()
     echo "  --ascii  : draft ASCII txt file for Publisher CIP data"
     echo "  --mobi   : draft Kindle .mobi file"
     echo "  --cover  : paperback book cover PDF generation"
-    echo "  --all    : alternative to using -a"    
+    echo "  --all    : alternative to using -a"
     echo ""
-    echo "options:"
-    echo "  -a             Generate ALL versions"
-    echo "  -f             Generate FINAL (non-draft) book versions"
-    echo "  -t             trial run: commands are shown but not executed"
-    echo "  -e             Deep trial run: sub-commands are shown but not executed"
-    echo "  -v             verbose output during command execution"
-    echo "  -q             quiet output during command execution"
+    echo "[options]:"
+    echo "  -a    Generate ALL versions (same as --all)"
+    echo "  -f    Generate FINAL (non-draft) book versions"
+    echo "  -g    Use hardCover ISBN and optional price for barcode"
+    echo "  -t    Trial run: commands are shown but not executed"
+    echo "  -e    Deep trial run: sub-commands are shown but not executed"
+    echo "  -v    Verbose output during command execution"
+    echo "  -q    Quiet output during command execution"
     echo ""
+    echo "A [booktype] is a [version], without the leading '--'."
+    echo "Either [version] or [booktype] can be used to select targets."
     exit 1
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 function main()
 {
+    if [[ $makeBoth -eq 1 ]]; then makeBook=1; makeEpub=1; fi
     local runit=$((makeAll+makeCover+makeBook+makePdf+makeAscii+makeHtml+makeEpub+makeMobi))
     if [[ $runit -eq 0 ]]; then
         scriptUsage
@@ -318,7 +386,17 @@ function main()
     exit 0
 }
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# Indirect assignment to a variable whose name is supplied.
+function setIndirect()
+{
+    local p="$1"
+    local v="$2"
+    eval "$p=$v"
+}
+
+#------------------------------------------------------------------------------
+# Do indirect assignment if the argument matches a specific name.
 function setArg()
 {
     local a="$1"
@@ -326,13 +404,14 @@ function setArg()
     local p="$3"
     #echo "--- Checking [$argv] == [--$v]"
     if [[ "$a" == "--$v" ]]; then
-        eval "$p=1"
+        setIndirect $p 1
         return 0
     fi
-
     return 1
 }
 
+#------------------------------------------------------------------------------
+# Assigns a global variable to select a build mode based on parameter
 function checkModes()
 {
     local a="$1"
@@ -353,6 +432,7 @@ function checkModes()
         "ascii"       "makeAscii"
         "text"        "makeAscii"
         "txt"         "makeAscii"
+        "both"        "makeBoth"
         "all"         "makeAll"
         "a"           "makeAll"
     )
@@ -380,7 +460,7 @@ OPTIND=1 # Reset in case getopts has been used previously in the shell.
 while checkModes "$1" ; do
     shift
 done
-while getopts ":h?avqeft" opt; do
+while getopts ":h?gavqeft" opt; do
     case "$opt" in
         h|\?)
             scriptUsage
@@ -388,6 +468,8 @@ while getopts ":h?avqeft" opt; do
             ;;
         a)  makeAll=1
             ;;            
+        g)  hardcover=1
+            ;;
         v)  verbose=1
             ;;
         q)  quiet=1
@@ -402,6 +484,14 @@ while getopts ":h?avqeft" opt; do
 done
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
-main "$@"
+for var in "$@"; do
+    echo "--$var"
+    if  ! checkModes "--$var" ; then
+        if  ! checkModes "$var" ; then
+            error "Sorry, '$var' is not a valid book type."
+        fi
+    fi
+done
+main 
 # - End of bash script.
 

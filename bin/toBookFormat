@@ -17,7 +17,6 @@ declare -x bookName # Export to shell.
 declare -a devNames
 declare toDir
 declare toformat
-declare bibName
 declare parametersName
 declare setParametersScript="setParameters.bash"
 declare rebuildScript="rebuild.bash"
@@ -194,7 +193,6 @@ function prepareDir()
     if [[ -d "$toDir" ]]; then
         if test "$(ls -A "$toDir")"; then
             checkDir "$toDir" "$bookName.tex"
-            checkDir "$toDir" "$bibName.bib"
             qecho "- Clearing (deleting) $toDir/*"
             run "rm -rf '$toDir/*'"
         else
@@ -217,7 +215,6 @@ function prepareDir()
     run "mkdir -p \"$toDir/tex\""
     run "cp $bookName.tex   \"$toDir\""
     copyIfExists "$bookName.cfg" "$toDir"
-    copyIfExists "$bibName.bib"  "$toDir"
     if [[ $ishtml -eq 1 ]]; then
         copyIfExists "tex4ht.env"   "$toDir"
 #       copyIfExists "idxmake.4ht"  "$toDir"
@@ -306,6 +303,12 @@ function makePdf()
 {
     local pdfparms="-synctex=1 -interaction=nonstopmode \"$bookName\".tex"
     if [[ totext -eq 1 ]]; then
+        logrun "Latex to PDF -- pass 1" "pdflatex" "$pdfparms" 1
+        logrun "Generate bibliography" "bibtex" "\"$bookName\".aux" 1
+        logrun "Latex to PDF -- pass 2" "pdflatex" "$pdfparms" 1
+        logrun "Generate referenced authors list" "authorindex" "\"$bookName\"" 2
+        logrun "Generate index" "makeindex" "\"$bookName\".idx" 2
+        logrun "Latex to PDF -- pass 3" "pdflatex" "$pdfparms" 1        
         pdfparms="--output-format=dvi $pdfparms"
         logrun "Latex to DVI ($bookName.dvi)" "pdflatex" "$pdfparms" -1
     else
@@ -318,6 +321,14 @@ function makePdf()
         logrun "Latex to PDF -- pass 4" "pdflatex" "$pdfparms" 1
     fi
  }
+
+# External bounding box files for images.
+function makeXbbFiles()
+{
+    run "shopt -s globstar"
+    logrun "Generate XBB files for JPG images" "ebb" "-xv images/**/*.jpg" 3
+    logrun "Generate XBB files for PNG images" "ebb" "-xv images/**/*.png" 3
+}
 
 function makeMobi()
 {
@@ -332,6 +343,8 @@ function makeMobi()
 
 function makeEpub()
 {
+    #makeXbbFiles
+    #logrun "Resize XBB files" "../bin/resizeXbb.py" "--stringIO -dir=images" 3
     local cmd="$bookName.tex"
     if [[ -e "$bookName.cfg" ]]; then
         cmd="--config $bookName.cfg $cmd"
@@ -361,8 +374,20 @@ function makeText()
 {
     qecho "- Convert the $bookName.dvi into a raw text file."
     runIgnore "catdvi $bookName.dvi 1> $bookName.tx1 2> $bookName.der"
-    qecho "- Remove the extra spaces from the text."
-    run "perl -pe 's/[ ]+/ /g' < $bookName.tx1 1> $bookName.txt"
+    qecho "- Remove duplicate spaces and wierd stuff from the text."
+    # run "perl -pe 's/[ ]+/ /g' < $bookName.tx1 1> $bookName.txt"
+    # Extra fixups to add:
+    #       'ø' ==> 'fi'
+    #       'Œ' ==> 'ffi'
+    #       'œ' ==> 'ff'
+    #       'Æ' ==> 'fl'
+    #       'ı' ==> '"'
+    #       'j' ==> '"' [YIKES]
+    #       '¯' ==> '---'
+    #       '' ==> '<CR>'
+    run "perl -pe 's/[ ]+/ /g; s/ø/fi/g; s/Œ/ffi/g; s/œ/ff/g; s/Æ/fl/g; s/ı/"'"'"/g; s/¯/---/g ' < $bookName.tx1 1> $bookName.tx2"
+    qecho "- Remove form feeds from the text."
+    run "tr -s '\f' ' ' < $bookName.tx2 1> $bookName.txt"
 }
 
 # htlatex eBook
@@ -371,10 +396,14 @@ function makeText()
 # htlatex eBook
 function makeHtml()
 {
+    makeXbbFiles
     logrun "Generate HTML -- pass 1" "htlatex" "\"$bookName\"" 3
     logrun "Hypertext index preprocessor" "tex" "'\\def\\filename{{$bookName}{idx}{4dx}{ind}} \\input idxmake.4ht'" 1
     logrun "Make hyperlinked index" "makeindex" "-o \"$bookName\".ind \"$bookName\".4dx " 2    
     logrun "Generate HTML -- pass 2" "htlatex" "\"$bookName\"" 3
+    run "mv \"$bookName.html\" \"$bookName.htmlx\""
+    echo '- Rescale all <img> elements to make them look nice'
+    run "resizeHtmlImgs.py < \"$bookName.htmlx\" > \"$bookName.html\""
 }
 
 #------------------------------------------------------------------------
@@ -482,7 +511,7 @@ function showBookInfo()
 function scriptUsage()
 {
     if [[ -z "$toDir" ]]; then
-        echo "Usage: $scriptName [format] [options] [bookname] [bibname]"
+        echo "Usage: $scriptName [format] [options] [bookname]"
         echo ""
         echo "Formats:"
         echo "  --toebook    : make and check an .epub ebook."
@@ -491,7 +520,7 @@ function scriptUsage()
         echo "  --totext     : make an ascii text editing copy."
         echo "  --toraw      : copy book files to a directory."
     else
-        echo "Usage: $scriptName $toformat [options] [bookname] [bibname]"
+        echo "Usage: $scriptName $toformat [options] [bookname]"
         echo "Produce $destDescription from $bookName.tex"
     fi
     echo ""
@@ -506,10 +535,8 @@ function scriptUsage()
     echo ""
     if [[ -n "$toDir" ]]; then
         echo "A $toDir subdirectory is created and populated with the"
-        echo "[bookname].tex. The optional [bibname].bib is also copied"
-        echo "as are the /tex and /images directories."
+        echo "[bookname].tex. The /tex and /images directories are also copied."
     fi
-    echo "If [bibname] is omitted, book.bib is assumed."
     echo ""
     echo "Each command produces its own log file in the logs subdirectory."
     echo "*** NOTE *** The target directory is cleared first. BE CAREFUL."
@@ -548,22 +575,15 @@ function main()
         scriptUsage 
     fi
     removeExtension "$1" "tex"; local bookName="$rv"
-    removeExtension "$2" "bib"; local bibName="$rv"
     if [[ "." -ef "$toDir" ]]; then
         fail "Input and output directory cannot be the same"
     fi
-    # Use the 'book.bib' unless one is explicitly provided.
-    if [[ -z "$bibName" ]]; then
-        bibName="book"
-    fi
     requireFile "LaTex"  "$bookName.tex"
-    requireFile "BibTex" "$bibName.bib"
     if [[ $showInfo -eq 1 ]]; then
         requireFile "Parameters"  "$parametersName.tex"
     else
         vecho "- Converting LaTex book into $destDescription."
         vecho "---  Input Tex:$bookName.tex"
-        vecho "---  Input Bib:$bibName.bib"
         vecho "--- Output dir:$toDir"
         prepareDir
         if [[ $toraw -eq 0 ]]; then
@@ -595,7 +615,6 @@ function main()
 
 argv="$1"
 parametersName="BookParameters"
-bibName="book"
 bookName="book"
 if scriptVersion "tokindle" ; then
     toformat="--tokindle"

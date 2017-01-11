@@ -1,19 +1,19 @@
 % ----------------------------------------------------------------------------
 % eBook - [Your Book Name Here] - MASTER LaTeX File
 % -----------------------------------------------------------------------------
-% Copyright 2016 [your name] - All rights reserved.
+% Copyright 2017 [your name] - All rights reserved.
 % 
-% This is the Tex4Ebook version of this work. 
-% It is designed to be formatted into .mobi or .epub versions for
+% This is the Tex4eBook version of this work. 
+% It is designed to be formatted into .mobi, .epub, or .pdf versions for
 % distribution to Amazon's Kindle, Apple iBooks, Barnes and Noble NookPress,
 % or other ebook venders. An Html page can also be produced.
 %
 % Note: the makebook --epub script should be used to do the actual formatting.
 % This will run epubcheck against the resulting .epub. The Calibre eBook editor
-% should be used to check the resulting epub for quality and correct
-% all errors found by epubcheck. 
+% should be used to check the resulting epub for quality and correct all
+% errors found by epubcheck, BEFORE uploading to Ingram, CreateSpace, etc.
 %
-% When epubcheck runs clean use Calibre to convert to .mobi and other formats.
+% After epubcheck runs clean use Calibre to convert to .mobi and other formats.
 % -----------------------------------------------------------------------------
 \listfiles
 \documentclass[10pt,oneside]{book}
@@ -58,10 +58,10 @@
 \Boolean{EDITMODE}    {no}     % Editing mode (double spaced)
 
 % Warning. Watermarks generate errors, but the doc still builds.
-\Boolean{WATERMARK}   {false}  % Place a watermark on the text (SLOW)
+\Boolean{WATERMARK}   {false}  % Place a watermark on the text (VERY SLOW)
 
 \Boolean{TOHTML}      {true}   % Format for Tex4HT conversion
-\Boolean{TOMOBI}      {true}   % Extra Formatting for Kindle .MOBI
+\Boolean{TOMOBI}      {false}  % Extra Formatting for Kindle .MOBI
 \Boolean{TOEPUB}      {false}  % Extra Formatting for IDPF .EPUB
 \Boolean{RAWHTML}     {no}     % Allow /HCode directly in text [no PDF]
 
@@ -74,14 +74,17 @@
 \Boolean{CHAPTERNOTES}{off}    % Place endnotes at end of each chapter
 \Boolean{NOBODY}      {false}  % Incude only the intro [debugging]
 \Boolean{NOLISTS}     {off}    % Do not generate lists of figures and tables
-\Boolean{NOFIGLIST}   {off}    % Do not generate list of tables
-\Boolean{NOTABLIST}   {on}     % Do not generate list of figures
+\Boolean{NOFIGLIST}   {off}    % Do not generate list of figures
+\Boolean{NOFIGSRCS}   {on}     % Do not generate a list of figure sources
+\Boolean{NOTABLIST}   {on}     % Do not generate list of tables
 \Boolean{NOINDEX}     {off}    % Do not generate index entries
 \Boolean{NOAUTHORS}   {off}    % Do not include the Authors section
 \Boolean{NOHYPERREF}  {off}    % Disables hyperref - href linking
-
 \Boolean{NOABBR}      {true}   % Suppress abbreviations section
 \Boolean{NOIMAGES}    {no}     % Disable Graphics inclusion
+
+\Boolean{ONECOLUMN}   {true}   % Use single column for indexes, authors, etc.
+\Boolean{IMAGEMATH}   {true}   % Use saved images for complex math expressions
 
 %% ----------------------------------------------------------------------------
 %% John's COMMON Packages and Command Macros 
@@ -104,7 +107,8 @@
 \ifthenelse{\boolean{FINALFORM}}{}{
 \ifthenelse{\boolean{EDITMODE}}{\linespread{1.6}}{}}
 
-\makeindex% Enable \index commands
+\InitMakeIndex % Set up \index commands
+\makeindex     % Enable \index commands (oddly, must be at top level)
 
 %------------------------------------------------------------------------------
 %% Nomenclature and abbreviation commands
@@ -169,23 +173,26 @@
 \ifthenelse{\boolean{NOBODY}}{}{
   \input{tex/body}%
 }              
-\ChapterSuffix%
 
-%% ----------------------------------------------------------------------------
-%% ----------------------------------------------------------------------------
+%\clearpage  % flush any floating elements
+\backmatter			
 \BookEndNotes
 
 %% ----------------------------------------------------------------------------
 %% ----------------------------------------------------------------------------
 %% References [Bibliography of /cited works]
-
-%\clearpage  % flush any floating elements
-\backmatter					% book only 
 %\setcounter{page}{499}% Set the page number
 \cleardoublepage\phantomsection%
 \addcontentsline{toc}{chapter}{Bibliography}%
-\bibliography{book}
 
+% Note! If you have more than one bibliography file, make sure to
+% put them all on the same line or TeXlive gets confused.
+\bibliography{tex/bib/book}
+
+%% NOTE! Changing the bibliography style will cause massive reformatting of
+%% all of the text. You will need to check every page for bad box warnings:
+%% ()over/under full \hbox) lines. Don't do this lightly.
+%%
 %\bibliographystyle{apalike}    % Prime Author and year
 \bibliographystyle{plain}       % Just numbers
 %\bibliographystyle{abbrv}      
@@ -194,56 +201,45 @@
 
 %% ----------------------------------------------------------------------------
 %% Cited Authors
-\ifthenelse{\boolean{NOAUTHORS}}{}{%
-  \ifthenelse{\boolean{TOHTML}}{%
-    \renewcommand\indexspace{
-    }%
-  }{}%
-  \cleardoublepage\phantomsection%
-  \chapter*{Authors Cited}
-  \addcontentsline{toc}{chapter}{Authors Cited}%
-  \begin{multicols}{2}%
-	\printauthorindex%
-  \end{multicols}
-}
+\PrintAuthorIndex
 
-
+%
 %% ----------------------------------------------------------------------------
-%% Figures and Tables lists\
+%% List of Figure Sources 
 \ifthenelse{\boolean{NOLISTS}}{}{%
   \cleardoublepage\phantomsection%
   \ifthenelse{\boolean{NOFIGLIST}}{}{%
-    \ifthenelse{\boolean{TOHTML}}{%
-      \addcontentsline{toc}{chapter}{List of Figures}%
-    }{}%  
-    \listoffigures%
-  }
-  \ifthenelse{\boolean{NOTABLIST}}{}{%
-    \ifthenelse{\boolean{TOHTML}}{%
-      \addcontentsline{toc}{chapter}{List of Tables}%
-    }{}%  
-    \listoftables%
+    % List of Figure Sources (attributions)
+    \ifthenelse{\boolean{NOFIGSRCS}}{}{%
+      \newpage
+      \RunningHeads{FIGURE SOURCES}%
+      \addcontentsline{toc}{chapter}{List of Figure Sources}%
+      \listofsources
+      \noindent\textbf{Note}: Additional information on sources and attributions for illustrations and figures can be found online at 
+      \URL{http://YourBooksURL.com/}      
+    }
   }
 }
-
-%% ----------------------------------------------------------------------------
-%% Permuted index 
-\ifthenelse{\boolean{NOINDEX}}{}{%
- %\clearpage%
-  \cleardoublepage\phantomsection%
-% \setcounter{page}{999} % Set the page number
-  \renewcommand{\indexname}{Index}%
-  \addcontentsline{toc}{chapter}{The Index}%
-  \PrintIndex% 
-}%
-
+%
 %% ----------------------------------------------------------------------------
 %% Nomenclature, Terms, Abbreviations, Acronyms, and Glossary 
 \ifthenelse{\boolean{NOABBR}}{}{
-  \cleardoublepage\phantomsection%
+  \newpage
   \addcontentsline{toc}{chapter}{Abbreviations and Terms}
   \PrintAcronyms%
-}
+}%
+%
+%% ----------------------------------------------------------------------------
+%% Permuted index 
+\ifthenelse{\boolean{NOINDEX}}{}{%
+  \cleardoublepage\phantomsection%
+  % \setcounter{page}{999} % Set the page number [debugging]
+  \renewcommand{\indexname}{Index}%
+  \addcontentsline{toc}{chapter}{The Index}%
+  \raggedright
+  \PrintIndex% 
+}%
+\RunningHeads{}
 %
 %% ----------------------------------------------------------------------------
 %% Page of metrics and diagram about the physical and logical page format.
@@ -253,5 +249,10 @@
 	\pagediagram
 	\pagevalues
 \fi
-%
+%%
+ ----------------------------------------------------------------------------
+\cleardoublepage\phantomsection%
+
+\typeout{\detokenize{\TRAP-LOG-MESSAGE}\{\TheAuthor message\}}.
+
 \end{document}
