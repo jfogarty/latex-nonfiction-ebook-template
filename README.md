@@ -6,7 +6,7 @@ book using content written in LaTeX. Modern books need to be formatted for
 printing, as PDFs, as websites, and as eBooks (for Apple iBooks, KOBO, Amazon
 Kindle and other electronic publishers). This template provides a model for
 creating all of these versions, using the same LaTeX source files. You will 
-need to annotate your LaTeX files using commands supplied in the `zzInit.tex`,
+need to annotate your LaTeX files using commands supplied in the `zzInit.tex`
 commands file in order to build all your book formats successfully.
 
 Note that these tools are specifically for use by independent self-publishers
@@ -19,7 +19,7 @@ entirely different than these.
 
 [This is the eBook version from eBook.tex as PDF](eBook.pdf)
 
-This template is for a fully publishable book, rather than a toy example, so the it contains:
+This template is for a fully publishable book, rather than a toy example, so it contains:
 
 1. **Front matter**
   * A Half Title page (just the book title)
@@ -49,7 +49,7 @@ To use this project you'll need to have some familiarity with LaTeX. To be reall
 
 `BookParameters.tex` is the LaTeX file containing defines about your book. 
 You edit this while constructing your book. All LaTeX root files for the same
-publication include this file.
+publication include this file. There are currently six LaTeX root files, `book.tex`, `eBook.tex`, and four `cover/*.tex` files (if you import [my Github cover project](https://github.com/jfogarty/latex-createspace-bookcover)).
 
 `book.tex` is the LaTeX root file for the Print on Demand
 ([CreateSpace](https://www.createspace.com) or 
@@ -58,19 +58,27 @@ ASCII plain text draft formats for your book.
 
 The `book.tex` will used to generate a greyscale version for printing and
 a color version for a distribution PDF (A PDF that looks like the print
-version, but has live hypelinks and images in color).
+version, but has live hyperlinks and images in color).
 
 `eBook.tex` is the LaTeX root file for hyperlinked formats (EPUB (for KOBO
 and iBooks, MOBI for Amazon's Kindle (KDP), and html websites).
 
 The `./tex` sub-directory contains all of your book chapters, as will as
 the initialization macros (./tex/zzInit.tex), your abbreviations and special
-terms definitions (./tex/zzAbbr.tex), your title page ((./tex/zzTitlepage.tex),
-and your copyright page (./tex/zzCopyright.tex).
+terms definitions (./tex/zzAbbr.tex), your title page ((./tex/zzTitlepage.tex), and your copyright page (./tex/zzCopyright.tex).
+
+The `./tex/bib` sub-directory contains one or more BibTeX formatted bibliography files. For this Github project I've used only one, but, for
+a full sized book, I find its useful aggregate bibliographies by subject.
+You can have one set of bibliographies for all of your books, as only
+entries you actually **\cite** in your book will be generated in the
+bibliography and authors lists.
 
 The `./images` sub-directory contains all images and figures used in 
 the book. You should create **_BW** greyscale versions for the print
-formated version or you may get a nasty surprise from your printer.
+formated version or you may get a nasty surprise from your printer. 
+The `makebook` script generates **_BW** image versions for any that you've
+forgotten, but such images often require contrast adjustment by hand before
+they are really right for publication.
 
 `eBook.cfg` is used to add metadata to the `OEBPS/Content.opf` section of your eBooks. You'll need to manually edit this as described in the eBook format section below.
 
@@ -137,7 +145,7 @@ You will need to manually edit these values, but rarely.
 - PrintISBN: The 13 digit ISBN. Get from Bowker. 
 - PrintISBNShort: The 10 digit ISBN. Get from Bowker. 
 - HardcoverISBN: Optional for your hardback version. Get from Bowker.
-- HardcoverISBNShort  
+- HardcoverISBNShort: The short version of the above.
 - EbookISBN: The ebook ISBN, if you need one.
 - EbookISBNShort: The short version of the above.
 - TheCIPSubjectHeadings: Library of Congress Catalog Subject Headings. Get from QualityBooks
@@ -261,7 +269,9 @@ second **\Ix** form both typesets the text and adds it to the index under a
 specific category name. The third form both displays and indexes the text,
 but allows you to index by a name different that than displayed. This
 is most useful when you have variant forms of the text that should
-all index to the same entry such as nicknames, abbreviations, etc.
+all be indexed to the same entry such as nicknames, abbreviations, etc.
+
+Note that the **\PersonName** index command is special in that if the name is in the form `first last`, then it is indexed as 'last, first'. If your name is in any other format, then use the optional form: **\PersonName[indexed name]{displayed name}**, otherwise your index will look stupid.
 
 # Book Formats
 
@@ -349,8 +359,7 @@ resolve using the editor. Sorry, but that's how it is at this point.
 
 ### Format: mobi eBook (Amazon Kindle Direct Publishing)
 
-A .mobi can be generated directly, but this is just useful as a draft.
-You need to edit the .epub file with a good ePub editor such as [Calibre](http://calibre-ebook.com/) which can then be used to generate the .mobi.
+Generates an .epub and converts it to a .mobi. The generated .mobi is just useful as a draft, since you will need to edit the .epub file with a good ePub editor such as [Calibre](http://calibre-ebook.com/) which can then be used to generate the .mobi. The **TOMOBI** parameter is set before generation. It's important to use this, since Kindles provide less flexibility in font display, as well as other characteristics, so subtle variations in content are required to get the best results.
 
 Calibre can also be used to generate Kindle only **AZW3** formatted books, 
 which are essentially just highly compressed versions of mobi with DRM.
@@ -392,10 +401,10 @@ LaTeX file's \Boolean properties are modified to reflect the
 format of the book being built.
 
 ```
-Usage: makebook [version(s)] [options]
+Usage: makebook [version(s)] [options] [booktypes]
 Build some or all versions of a book
 
-versions (more than one may be selected):
+[versions] (more than one may be selected):
   --book   : grayscale PDF formatted for a paperback book
   --pdf    : color PDF with hyperlinks formatted for reading
   --epub   : eBook .epub archive with epubcheck validation
@@ -405,13 +414,17 @@ versions (more than one may be selected):
   --cover  : paperback book cover PDF generation
   --all    : alternative to using -a
 
-options:
-  -a             Generate ALL versions
-  -f             Generate FINAL (non-draft) book versions
-  -t             trial run: commands are shown but not executed
-  -e             Deep trial run: sub-commands are shown but not executed
-  -v             verbose output during command execution
-  -q             quiet output during command execution
+[options]:
+  -a    Generate ALL versions (same as --all)
+  -f    Generate FINAL (non-draft) book versions
+  -g    Use hardCover ISBN and optional price for barcode
+  -t    Trial run: commands are shown but not executed
+  -e    Deep trial run: sub-commands are shown but not executed
+  -v    Verbose output during command execution
+  -q    Quiet output during command execution
+
+A [booktype] is a [version], without the leading '--'.
+Either [version] or [booktype] can be used to select targets.
 ```
 
 ## `texclean` Utility
