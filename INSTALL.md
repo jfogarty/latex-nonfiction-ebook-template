@@ -84,6 +84,15 @@ In Configure|Shortcuts, make sure that Menus|Tools|User has an entry of the form
           1:Author Index    Alt-Shift-F1   Alt-Shift-F!
 ```
 
+Add an english language thesaurus by getting the current release of the
+[LibreOffice English Dictionaries](https://extensions.libreoffice.org/extensions/english-dictionaries). For me, this was the file `dict-en-20170701.oxt`.
+
+Unzip (extract) the files in the .oxt to any directory. Place the 
+`th_en_US_v2.dat` and `th_en_US_v2.idx` into a new root directory: `/usr/share/thesaurus`.
+
+In the "TeXstudio|Options|Configure TeXstudio..." page enter **/usr/share/thesaurus/th_en_US_v2.dat** into the "Dictionaries|Thesaurus database "field. Select [OK].
+
+
 #### Calibre eBook Manager
 
 This is the essential tool for editing and managing eBooks. It lets you load
