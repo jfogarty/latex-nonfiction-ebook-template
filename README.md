@@ -322,7 +322,7 @@ least half done in order to get a meaningful and complete classification.
 The .epub is the most complicated format since it includes many different
 hyperlinks, and while largely derived from html, does not have all the 
 flexibility of a set of web pages. The LaTeX is converted to html for
-eBooks, by the aptly named [tex4ebook]https://github.com/michal-h21/tex4ebook)
+eBooks, by the aptly named [tex4ebook](https://github.com/michal-h21/tex4ebook)
 program which is included with the TexLive 2016 distribution.
 
 You **must** manually edit the `eBook.cfg` file which defines
