@@ -1,0 +1,32 @@
+%% book_html.tex — lwarp web driver (2026 template seed)
+\documentclass[11pt,oneside]{book}
+\input{BookParameters.tex}
+
+\Boolean{ISBOOK}      {true}
+\Boolean{TOHTML}      {false}  % lwarp web driver (not tex4ht)
+\Boolean{USELUATEX}   {true}
+\Boolean{NOINDEX}     {true}
+\Boolean{NOAUTHORS}  {true}
+\Boolean{NOABBR}     {true}
+\Boolean{USESIUNITX} {true}
+\Boolean{ACCESSIBLE} {true}
+\Boolean{LEGACYTOC}  {false}
+
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\usepackage{lwarp}
+\input{tex/zzWeb.tex}
+\input{tex/zzInit.tex}
+
+\begin{document}
+\title{\TheMainTitle}
+\author{\TheAuthor}
+\date{\TheCopyrightYear}
+\maketitle
+\tableofcontents
+\input{tex/preface}
+\input{tex/introduction}
+\input{tex/body}
+\printbibliography[heading=bibintoc,title={Bibliography}]
+\end{document}

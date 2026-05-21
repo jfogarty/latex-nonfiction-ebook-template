@@ -14,7 +14,8 @@
 % fewer than 123 pages.
 %
 % Note that some printers require specific page count multiples:
-% -- Createspace: page count MUST be divisible by 2.
+% Updated 2026: KDP white 50lb default; CreateSpace folded into KDP in 2018.
+% -- KDP/Ingram: page count MUST be divisible by 2.
 % -- Ingram: page count MUST be divisible by 2.
 % -- Blurb : page count MUST be divisible by 6.
 % Add blank pages as needed in final PDF generations!
@@ -47,7 +48,7 @@
 \def\ThePublisherCity{Wyodaka}
 \def\ThePublisherState{QM}
 
-\def\ThePrinter{CreateSpace, An Amazon.com Company}
+\def\ThePrinter{KDP (Kindle Direct Publishing)}
 
 \def\TheSubjectArea{Yada, Yada, Yada}
 
@@ -124,11 +125,10 @@
 %% ----------------------------------------------------------------------------
 %% Computed parameters for cover and jacket design 
 
-% CreateSpace and Ingram, use different paper stock so the spine width must
-% be adjusted to refect that. 
-% For example Createspace, White paper: multiply page count by 0.002252
+% KDP and Ingram use different paper stock; adjust spine width accordingly.
+% KDP white 50lb (default): multiply page count by 0.002252
 %
-\pgfmathsetmacro\SinglePageThicknessPt{0.002252in}% Createspace, White B&W Paper
+\pgfmathsetmacro\SinglePageThicknessPt{0.002252in}% KDP, White 50lb B&W Paper
 %\pgfmathsetmacro\SinglePageThicknessPt{0.002143in}% Blurb, Standard and Econony B&W Paper
 %\pgfmathsetmacro\SinglePageThicknessPt{0.002602in}% Blurb, Standard and Economy Color Paper
 %\pgfmathsetmacro\SinglePageThicknessPt{0.002110in}% Ingram, Standard White B&W Paper (50lb)
@@ -168,7 +168,6 @@
 \pgfmathsetmacro\FoldVariance{\FoldVariancePt/ \PtsPerInch}%
  
 %% ----------------------------------------------------------------------------
-\renewcommand{\bf}[1]{\textbf{#1}}% Legacy \bf support.
 
 \newcommand{\SetBool}[2]{%
   \ifthenelse{\equal{#2}{true}\OR\equal{#2}{on}\OR\equal{#2}{yes}}%

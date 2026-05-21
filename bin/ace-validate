@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# DAISY ACE accessibility validator (non-fatal)
+set -euo pipefail
+EPUB_FILE="${1:?Usage: ace-validate <file.epub>}"
+LOG_DIR="${ARTIFACTS_DIR:-test-results/ace}"
+mkdir -p "$LOG_DIR"
+TS=$(date +%Y%m%d-%H%M%S)
+LOG="$LOG_DIR/ace-${TS}.log.txt"
+echo "=== ACE validation (non-fatal) ===" | tee "$LOG"
+if command -v npx >/dev/null 2>&1; then
+  if npx --yes @daisy/ace-cli "$EPUB_FILE" 2>&1 | tee -a "$LOG"; then
+    echo "[PASS] ACE validation completed" | tee -a "$LOG"
+  else
+    echo "[WARN] ACE validation reported issues (non-fatal)" | tee -a "$LOG"
+    exit 0
+  fi
+else
+  echo "[SKIP] npx not available — ACE validation skipped" | tee -a "$LOG"
+  exit 0
+fi
+echo "Log: $LOG"

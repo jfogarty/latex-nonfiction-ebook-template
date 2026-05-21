@@ -1,19 +1,15 @@
-#!/bin/bash
-# Invoke the .epub validation java tool
-# ----------------------------------------------------------------------------
-# LaTeX eBook utility tools
-# -----------------------------------------------------------------------------
-# John Fogarty - https://github.com/jfogarty - johnhenryfogarty@gmail.com
-# -----------------------------------------------------------------------------
-function main()
-{
-    jar=$HOME/LaTeX/epubcheck/target/epubcheck.jar
-    if [[ -e "$jar" ]]; then
-        exec java -jar $jar "$@"
-    else
-        echo "Sorry, \"$jar\" does not exist"
-        echo "Please, git clone https://github.com/IDPF/epubcheck.git"
-        echo "  then \"mvn install\" after reading the README.md"
-    fi
-}
-main "$@"
+#!/usr/bin/env bash
+set -euo pipefail
+EPUB_FILE="${1:?Usage: epubcheck <file.epub>}"
+LOG_DIR="${ARTIFACTS_DIR:-test-results/epubcheck}"
+mkdir -p "$LOG_DIR"
+TS=$(date +%Y%m%d-%H%M%S)
+LOG="$LOG_DIR/epubcheck-${TS}.log.txt"
+echo "=== EPUBCheck ===" | tee "$LOG"
+if command -v epubcheck >/dev/null 2>&1; then
+  epubcheck --locale en --profile default "$EPUB_FILE" 2>&1 | tee -a "$LOG"
+else
+  echo "[FAIL] epubcheck not found" | tee -a "$LOG"
+  exit 1
+fi
+echo "Log: $LOG"

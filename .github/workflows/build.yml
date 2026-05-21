@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches: [master, main, modernize/2026]
+  pull_request:
+    branches: [master, main, modernize/2026]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [print, ebook, web]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t latex-book-template .
+
+      - name: Run just ${{ matrix.target }}
+        run: docker compose run --rm book just ${{ matrix.target }}
+
+      - name: EPUBCheck (ebook only)
+        if: matrix.target == 'ebook'
+        run: docker compose run --rm book ./bin/epubcheck build/ebook/eBook.epub
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-output
+          path: |
+            build/print/book.pdf
+            build/ebook/eBook.epub
+            build/web/
+            web/dist/

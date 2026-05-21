@@ -1,0 +1,8 @@
+title: LaTeX Nonfiction Book Template
+description: Web preview built from lwarp output
+baseurl: ""
+plugins: []
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

@@ -1,0 +1,245 @@
+ 
+/* start css.sty */
+.lmbsy-10{font-weight:bold;}
+.lmbsy-10{font-weight:bold;}
+.lmbsy-10{font-weight:bold;}
+.lmbsy-7{font-size:70%;font-weight:bold;}
+.lmbsy-7{font-weight:bold;}
+.lmbsy-7{font-weight:bold;}
+.lmbsy-5{font-size:50%;font-weight:bold;}
+.lmbsy-5{font-weight:bold;}
+.lmbsy-5{font-weight:bold;}
+.msam-7{font-size:70%;}
+.msam-5{font-size:50%;}
+.msbm-7{font-size:70%;}
+.msbm-5{font-size:50%;}
+.rm-lmr-7{font-size:70%;}
+.rm-lmr-5{font-size:50%;}
+.lmmi-7{font-size:70%;}
+.lmmi-5{font-size:50%;}
+.lmsy7-{font-size:70%;}
+.lmsy5-{font-size:50%;}
+.ec-lmbx-12x-x-207{font-size:248%; font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmbx-12x-x-207{ font-weight: bold;}
+.ec-lmcsc-10x-x-120{font-size:120%; font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-120{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{font-size:144%; font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmcsc-10x-x-144{ font-variant: small-caps;}
+.ec-lmr-12{font-size:120%;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmbx-10{ font-weight: bold;}
+.ec-lmr-17x-x-120{font-size:204%;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmss-10{ font-family: sans-serif;}
+.ec-lmr-9{font-size:90%;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmri-10{ font-style:italic;}
+.ec-lmr-8{font-size:80%;}
+p{margin-top:0;margin-bottom:0}
+p.indent{text-indent:0;}
+p + p{margin-top:1em;}
+p + div, p + pre {margin-top:1em;}
+div + p, pre + p {margin-top:1em;}
+a { overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; hyphens: auto; }
+@media print {div.crosslinks {visibility:hidden;}}
+table.tabular{border-collapse: collapse; border-spacing: 0;}
+a img { border-top: 0; border-left: 0; border-right: 0; }
+center { margin-top:1em; margin-bottom:1em; }
+td center { margin-top:0em; margin-bottom:0em; }
+.Canvas { position:relative; }
+math { text-indent: 0em; }
+body{ margin:1em auto; max-width:80ch; padding:0 .62em; }
+h1,h2,h3,h4,h5 { line-height:1.2; }
+@media print{ body{ max-width:none } }
+.partHead, .likepartHead { font-size: 2em; }
+.chapterHead, .likechapterHead { font-size: 1.7411em; }
+.sectionHead, .likesectionHead { font-size: 1.5157em; }
+.subsectionHead, .likesubsectionHead { font-size: 1.3195em; }
+.subsubsectionHead, .likesubsubsectionHead { font-size: 1.1487em; }
+ @media (prefers-color-scheme: dark) { img[src^="eBook"]{filter: invert(1); } } 
+ body { background-color: Canvas; color: CanvasText; color-scheme: light dark; } 
+li p.indent { text-indent: 0em }
+li p:first-child{ margin-top:0em; }
+li p:last-child, li div:last-child { margin-bottom:0.5em; }
+li p:first-child{ margin-bottom:0; }
+li p~ul:last-child, li p~ol:last-child{ margin-bottom:0.5em; }
+.enumerate1 {list-style-type:decimal;}
+.enumerate2 {list-style-type:lower-alpha;}
+.enumerate3 {list-style-type:lower-roman;}
+.enumerate4 {list-style-type:upper-alpha;}
+div.newtheorem { margin-bottom: 2em; margin-top: 2em;}
+div.newtheorem .head{font-weight: bold;}
+.obeylines-h,.obeylines-v {white-space: nowrap; }
+div.obeylines-v p { margin-top:0; margin-bottom:0; }
+.overline{ text-decoration:overline; }
+.overline img{ border-top: 1px solid black; }
+td.displaylines {text-align:center; white-space:nowrap;}
+.centerline {text-align:center;}
+.rightline {text-align:right;}
+pre.verbatim {font-family: monospace,monospace; text-align:left; clear:both; }
+.fbox {padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+div.fbox {display:table}
+div.center div.fbox {text-align:center; clear:both; padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+div.minipage{width:100%;}
+div.center, div.center div.center {text-align: center; margin-left:1em; margin-right:1em;}
+div.center div {text-align: left;}
+div.flushright, div.flushright div.flushright {text-align: right;}
+div.flushright div {text-align: left;}
+div.flushleft {text-align: left;}
+.underline{ text-decoration:underline; }
+.underline img{ border-bottom: 1px solid black; margin-bottom:1pt; }
+.framebox-c, .framebox-l, .framebox-r { padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+.framebox-c {text-align:center;}
+.framebox-l {text-align:left;}
+.framebox-r {text-align:right;}
+span.thank-mark{ vertical-align: super }
+span.footnote-mark sup.textsuperscript, span.footnote-mark a sup.textsuperscript{ font-size:80%; }
+code.verb{font-family:monospace,monospace;}
+div.tabular, div.center div.tabular {text-align: center; margin-top:0.5em; margin-bottom:0.5em; }
+table.tabular td p{margin-top:0em;}
+table.tabular {margin-left: auto; margin-right: auto;}
+td p:first-child{ margin-top:0em; }
+td p:last-child{ margin-bottom:0em; }
+div.td00{ margin-left:0pt; margin-right:0pt; }
+div.td01{ margin-left:0pt; margin-right:5pt; }
+div.td10{ margin-left:5pt; margin-right:0pt; }
+div.td11{ margin-left:5pt; margin-right:5pt; }
+table[rules] {border-left:solid black 0.4pt; border-right:solid black 0.4pt; }
+td.td00{ padding-left:0pt; padding-right:0pt; }
+td.td01{ padding-left:0pt; padding-right:5pt; }
+td.td10{ padding-left:5pt; padding-right:0pt; }
+td.td11{ padding-left:5pt; padding-right:5pt; }
+table[rules] {border-left:solid black 0.4pt; border-right:solid black 0.4pt; }
+.hline hr, .cline hr{ height : 0px; margin:0px; }
+.hline td, .cline td{ padding: 0; }
+.hline hr, .cline hr{border:none;border-top:1px solid black;}
+.hline {border-top: 1px solid black;}
+.hline + .vspace:last-child{display:none;}
+.tabbing-right {text-align:right;}
+div.float, div.figure {margin-left: auto; margin-right: auto;}
+div.float img {text-align:center;}
+div.figure img {text-align:center;}
+.marginpar,.reversemarginpar {width:20%; float:right; text-align:left; margin-left:auto; margin-top:0.5em; font-size:85%; text-decoration:underline;}
+.marginpar p,.reversemarginpar p{margin-top:0.4em; margin-bottom:0.4em;}
+.reversemarginpar{float:left;}
+.equation td{text-align:center; vertical-align:middle; }
+td.eq-no{ width:5%; }
+table.equation { width:100%; } 
+div.math-display, div.par-math-display{text-align:center;}
+.array-hline,.array-cline{ border-top: 1px solid black; height:0px; }
+.array-hline + .array-vspace:last-child{display:none;}
+.hline-mtd, .array-hline td{ display:none }
+.array-hline:first-child{border-bottom:1px solid black;border-top:none;}
+math .texttt { font-family: monospace; }
+math .textit { font-style: italic; }
+math .textsl { font-style: oblique; }
+math .textsf { font-family: sans-serif; }
+math .textbf { font-weight: bold; }
+mo.MathClass-op + mi{margin-left:0.3em}
+mi + mo.MathClass-op{margin-left:0.3em}
+ math mstyle[mathvariant="bold"] { font-weight: bold; font-style: normal; } 
+ math mstyle[mathvariant="normal"] { font-weight: normal; font-style: normal; } 
+.newpage{page-break-before:always;}
+nav.toc ol{list-style: none;}
+.footnote{font-size:small;}
+.footnotes hr{width:30%;margin:0 auto 0 0;}
+p + section.footnotes{margin-bottom: 1rem;}
+.rotatebox{display: inline-block;}
+.partToc a, .partToc, .likepartToc a, .likepartToc {line-height: 200%; font-weight:bold; font-size:110%;}
+.chapterToc a, .chapterToc, .likechapterToc a, .likechapterToc, .appendixToc a, .appendixToc {line-height: 200%; font-weight:bold;}
+.index-item, .index-subitem, .index-subsubitem {display:block}
+div.caption {text-indent:-2em; margin-left:3em; margin-right:1em; text-align:center; margin-top: 0.5rem;}
+div.caption span.id{font-weight: bold; white-space: nowrap; }
+h1.partHead{text-align: center}
+p.bibitem { text-indent: -2em; margin-left: 2em; margin-top:0.6em; margin-bottom:0.6em; }
+p.bibitem-p { text-indent: 0em; margin-left: 2em; margin-top:0.6em; margin-bottom:0.6em; }
+.subsubsectionHead, .likesubsubsectionHead { font-size: 1em; }
+.paragraphHead, .likeparagraphHead { margin-top:2em; font-weight: bold;}
+.subparagraphHead, .likesubparagraphHead { font-weight: bold;}
+.verse{white-space:nowrap; margin-left:2em}
+div.maketitle {text-align:center;}
+h2.titleHead{text-align:center;}
+div.maketitle{ margin-bottom: 2em; }
+div.author, div.date {text-align:center;}
+div.thanks{text-align:left; margin-left:10%; font-size:85%; font-style:italic; }
+div.author{white-space: nowrap;}
+h1.partHead{text-align: center}
+ .chapterToc, .likechapterToc {margin-left:0em;}
+ .likesectionToc, .sectionToc {margin-left:1em;}
+ .likesubsectionToc, .subsectionToc {margin-left:2em;}
+ .likesubsectionToc, .subsectionToc {margin-left:2em;}
+ .likesubsubsectionToc, .subsubsectionToc {margin-left:3em;}
+.paragraphToc, .likeparagraphToc {margin-left:4em;}
+.subparagraphToc, .likesubparagraphToc {margin-left:5em;}
+figure.float, div.figure {margin-left: auto; margin-right: auto;}
+figure.figure {text-align:center;}
+figcaption.caption {text-indent:-2em; margin-left:3em; margin-right:1em; text-align:center;}
+figcaption.caption span.id{font-weight: bold; white-space: nowrap; }
+p + figcaption, img + figcaption{margin-top: 1em;}
+.caption span.id{font-weight: bold;}
+ .wrapfig-r, .wrapfig-ri, .wrapfig-ir, .wrapfig-ro, .wrapfig-or {float:right; text-align:left; margin-left:auto; margin-top:0.5em;} 
+ .wrapfig-l, .wrapfig-li, .wrapfig-il, .wrapfig-lo, .wrapfig-ol {float:left; text-align:left; margin-right:auto; margin-top:0.5em;} 
+.wrapfig-r .caption td.content, .wrapfig-ri .caption td.content, .wrapfig-ir .caption td.content, .wrapfig-ro .caption td.content, .wrapfig-or .caption td.content, .wrapfig-l .caption td.content, .wrapfig-li .caption td.content, .wrapfig-il .caption td.content, .wrapfig-lo .caption td.content, .wrapfig-ol .caption td.content {white-space: normal; }
+.wrapfig-r .caption, .wrapfig-ri .caption, .wrapfig-ir .caption, .wrapfig-ro .caption, .wrapfig-or .caption, .wrapfig-l .caption, .wrapfig-li .caption, .wrapfig-il .caption, .wrapfig-lo .caption, .wrapfig-ol .caption {width:30%; }
+dl.enumerate {display:grid; grid-template-columns: 3ch 1fr; align-items: top; row-gap:1ch;}
+dd.enumerate {margin-left: 0;}
+dt.printshorthands{float:left; clear:left; margin-right:1em;}
+.tcolorbox{margin-top:0.5em;margin-bottom: 0.5em;}
+.tcolorbox .lowerbox{margin-top:0pt;}
+div.verbatiminput {font-family: monospace,monospace; white-space: nowrap; }
+/* end css.sty */
+
