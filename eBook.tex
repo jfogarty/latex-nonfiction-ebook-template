@@ -78,27 +78,27 @@
 \Boolean{NOFIGSRCS}   {on}     % Do not generate a list of figure sources
 \Boolean{NOTABLIST}   {on}     % Do not generate list of tables
 \Boolean{NOINDEX}     {off}    % Do not generate index entries
-\Boolean{NOAUTHORS}   {off}    % Do not include the Authors section
-\Boolean{NOHYPERREF}  {off}    % Disables hyperref - href linking
+\Boolean{NOAUTHORS}   {true}   % Authors Cited deferred for EPUB (biblatex+tex4ht)
+\Boolean{NOHYPERREF}  {true}   % Avoid nested anchors in EPUB (EPUBCheck)
 \Boolean{NOABBR}      {true}   % Suppress abbreviations section
 \Boolean{NOIMAGES}    {no}     % Disable Graphics inclusion
 
 \Boolean{ONECOLUMN}   {true}   % Use single column for indexes, authors, etc.
 \Boolean{IMAGEMATH}   {true}   % Use saved images for complex math expressions
 
-%% ----------------------------------------------------------------------------
-%% John's COMMON Packages and Command Macros 
+\Boolean{USELUATEX}   {false}  % make4ht uses pdfLaTeX
+\Boolean{ACCESSIBLE}  {true}
+\Boolean{USESIUNITX}  {false}  % siunitx conflicts with tex4ht in sample
+\Boolean{LEGACYTOC}   {false}
 
+%% ----------------------------------------------------------------------------
 \input{tex/zzInit.tex}%                % Document packages and commands
 \usepackage{lipsum}
 %% ----------------------------------------------------------------------------
 
 %\usepackage{showidx}					% Enable index display in margins for checking
 
-\advance\hoffset by -0.7 truein\relax
-
-\def\theaipage{\string\hyperpage{\thepage}} 
-\let\footnote=\endnote                  % Convert all footnotes into endnotes
+\SetupBookEndnotes
 \setlength{\columnsep}{5mm}             % Space between two columns
 
 \appto{\theindex}{\spaceskip=.33333em plus .33333em minus .11111em }
@@ -183,21 +183,7 @@
 %% References [Bibliography of /cited works]
 %\setcounter{page}{499}% Set the page number
 \cleardoublepage\phantomsection%
-\addcontentsline{toc}{chapter}{Bibliography}%
-
-% Note! If you have more than one bibliography file, make sure to
-% put them all on the same line or TeXlive gets confused.
-\bibliography{tex/bib/book}
-
-%% NOTE! Changing the bibliography style will cause massive reformatting of
-%% all of the text. You will need to check every page for bad box warnings:
-%% ()over/under full \hbox) lines. Don't do this lightly.
-%%
-%\bibliographystyle{apalike}    % Prime Author and year
-\bibliographystyle{plain}       % Just numbers
-%\bibliographystyle{abbrv}      
-%\bibliography{bib,bib_extra}
-%\bibliographystyle{alpha}       % Authors last name first letters, year
+\printbibliography[heading=bibintoc,title={Bibliography}]
 
 %% ----------------------------------------------------------------------------
 %% Cited Authors

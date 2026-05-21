@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8' ?> 
+<package unique-identifier='dcidid' version='3.0' xmlns='http://www.idpf.org/2007/opf'> 
+<metadata xmlns:dc='http://purl.org/dc/elements/1.1/' xmlns:opf='http://www.idpf.org/2007/opf'> 
+<dc:title>Unnamed</dc:title> 
+<dc:language>en</dc:language> 
+<dc:identifier id='dcidid'>92cb3522-cf8b-4358-c066-6aee78b2bdd4</dc:identifier> 
+<dc:creator>Anonymous</dc:creator> 
+<dc:date>2026-05-21T12:19:00Z</dc:date>  
+<meta property='dcterms:modified'>2026-05-21T12:19:00Z</meta> 
+<dc:title>The Ultimate Book: Hey! Why Not Read This One?</dc:title> 
+<dc:creator>Wilson J. Schmeggles</dc:creator> 
+<dc:language>en-US</dc:language> 
+<meta property='schema:accessibilityFeature'>structuralNavigation</meta> 
+<meta property='schema:accessibilityFeature'>tableOfContents</meta> 
+<meta property='schema:accessibilityFeature'>readingOrder</meta> 
+<meta property='schema:accessibilitySummary'>Text-only sample book with structural navigation.</meta> 
+<meta property='schema:accessibilityHazard'>none</meta> 
+<dc:subject>Non-Fiction</dc:subject> 
+<dc:subject>Science</dc:subject> 
+<dc:description>
+&lt;div&gt;&lt;p&gt;Sample EPUB description for the 2026 template
+modernization.&lt;/p&gt;&lt;/div&gt;</dc:description></metadata>   
+<manifest> 
+<item href='eBook.ncx' id='ncx' media-type='application/x-dtbncx+xml'></item> 
+<item href='eBook.css' id='stylesheet' media-type='text/css'></item> 
+<item href='eBook.xhtml' id='file1' media-type='application/xhtml+xml'></item> 
+<item href='eBookli1.xhtml' id='file2' media-type='application/xhtml+xml' properties='nav'></item> 
+<item href='eBookli2.xhtml' id='file3' media-type='application/xhtml+xml'></item> 
+<item href='eBookch1.xhtml' id='file4' media-type='application/xhtml+xml' properties='mathml'></item> 
+<item href='eBookch2.xhtml' id='file5' media-type='application/xhtml+xml'></item> 
+  
+<item href='images/ebookcover.jpg' id='cover-image' media-type='image/jpeg' properties='cover-image'></item>
+<item href='images/eBookCoverPage.jpg' id='imageseBookCoverPage_jpg' media-type='image/jpeg'></item>
+<item href='images/Flowers1and2.jpg' id='imagesFlowers1and2_jpg' media-type='image/jpeg'></item>
+<item href='images/Albert_Einstein1.jpg' id='imagesAlbert_Einstein1_jpg' media-type='image/jpeg'></item>
+</manifest> 
+   
+<spine toc='ncx'> 
+<itemref idref='file1'></itemref> 
+<itemref idref='file2'></itemref> 
+<itemref idref='file3'></itemref> 
+<itemref idref='file4'></itemref> 
+<itemref idref='file5'></itemref> 
+  
+ 
+</spine> 
+</package>

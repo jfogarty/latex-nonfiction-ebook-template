@@ -13,23 +13,18 @@
 %
 % Use the ./bin/makebook script to generate the various book formats. 
 % -----------------------------------------------------------------------------
-\documentclass[        % KOMA-Script Book Formatting
+\documentclass[        % KOMA-Script Book Formatting (LuaLaTeX; no pagesize=pdftex)
   twoside=true,
   paper=6in:9in,
   DIV=calc,
   BCOR=1.25in,         % Inner gutters width
   fontsize=10pt,
-  pagesize=pdftex,
   parskip=half
 ]{scrbook}
 
 %% ----------------------------------------------------------------------------
 %% ----- Document Information
 \input{BookParameters.tex}
-
-\evensidemargin=0.38in  % Pushes left pages to right.
-\topmargin=-0.8in      % Pushes entire page contents down
-\textwidth=4.5in       % width of actual text area
 
 \usepackage{scrhack}   % fix \float@addtolists detected! in KOMA scripts.
 
@@ -82,15 +77,18 @@
 \Boolean{ONECOLUMN}   {no}     % Use single column for indexes, authors, etc.
 \Boolean{IMAGEMATH}   {no}     % Use saved images for complex math expressions
 
-%% ----------------------------------------------------------------------------
-\advance\hoffset by -0.7 truein\relax
+\Boolean{USELUATEX}   {true}   % LuaLaTeX engine (false = pdfLaTeX fallback)
+\Boolean{ACCESSIBLE}  {true}   % Accessibility metadata for EPUB
+\Boolean{USESIUNITX}  {true}   % Load siunitx for units
+\Boolean{LEGACYTOC}   {false}  % Use legacy shorttoc summary TOC
 
+%% ----------------------------------------------------------------------------
 \input{tex/zzInit.tex}%                % Document packages and commands
 \usepackage{lipsum}
 %\usepackage{showidx}					% Enable index display in margins for checking
 
 \def\theaipage{\string\hyperpage{\thepage}} 
-\let\footnote=\endnote                  % Convert all footnotes into endnotes
+\SetupBookEndnotes
 \setlength{\columnsep}{1cm}             % Space between two columns
 
 \appto{\theindex}{\spaceskip=.33333em plus .33333em minus .11111em }
@@ -167,20 +165,26 @@
 \setcounter{page}{3} % Set the page number
 %
 % Name the sections as needed
-%\renewcommand{\contentsname}{\huge{Contents}}%
+\setkomafont{disposition}{\normalfont\bfseries}
+\addtokomafont{partnumber}{\huge}
 \renewcommand*\contentsname{\huge{Detailed Contents}}
 \renewcommand{\listfigurename}{List of Figures}%
 \renewcommand{\listtablename}{List of Tables}%
 %
 \pagestyle{plain}
-\begingroup% Isolate these changes to just the shorttoc command.
-	%\normalsize%
-	\setlength{\parskip}{-2pt}% More negative for tighter spacing.
-	\pdfbookmark[1]{Contents}{toc}%
-	\shorttoc{Summary Contents}{0}% Tighter spacing, Chapter names only.
-\endgroup%
-
-\cleardoublepage
+\setcounter{tocdepth}{2}
+\KOMAoptions{toc=indented,toc=bibliography,toc=index}
+\pdfbookmark[1]{Contents}{toc}%
+\ifthenelse{\boolean{LEGACYTOC}}{%
+  \begingroup
+    \setlength{\parskip}{-2pt}%
+    \shorttoc{Summary Contents}{0}%
+  \endgroup
+  \cleardoublepage
+}{%
+  \summaryTOC
+  \cleardoublepage
+}
 \tableofcontents
 %
 %% ----------------------------------------------------------------------------
@@ -230,15 +234,7 @@
 %% References [Bibliography of /cited works]
 %\setcounter{page}{499}% Set the page number
 \cleardoublepage\phantomsection%
-\addcontentsline{toc}{chapter}{Bibliography}%
-\bibliography{tex/bib/book}%
-
-%% NOTE! Changing the bibliography style will cause massive reformatting of
-%% all of the text. You will need to check every page for bad box warnings:
-%% ()over/under full \hbox) lines. Don't do this lightly.
-%%
-%\bibliographystyle{apalike}    % Prime Author and year
-\bibliographystyle{plain}       % Just numbers
+\printbibliography[heading=bibintoc,title={Bibliography}]
 
 %% ----------------------------------------------------------------------------
 %% Cited Authors

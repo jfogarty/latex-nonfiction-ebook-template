@@ -1,0 +1,29 @@
+{
+  "name": "LaTeX Book Template",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/book",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "James-Yu.latex-workshop",
+        "efoerster.texlab",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "latex-workshop.latex.outDir": "build/print",
+        "latex-workshop.latex.tools": [
+          {
+            "name": "lualatex",
+            "command": "lualatex",
+            "args": ["-synctex=1", "-interaction=nonstopmode", "-output-directory=build/print", "%DOC%"]
+          }
+        ]
+      }
+    }
+  },
+  "postCreateCommand": "just doctor",
+  "remoteUser": "root"
+}

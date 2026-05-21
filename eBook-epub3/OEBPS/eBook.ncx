@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx version='2005-1' xmlns='http://www.daisy.org/z3986/2005/ncx/'>
+  <head>
+    <meta content='92cb3522-cf8b-4358-c066-6aee78b2bdd4'
+    name='dtb:uid' />
+    <meta content='3' name='dtb:depth' />
+    <meta content='0' name='dtb:totalPageCount' />
+    <meta content='0' name='dtb:maxPageNumber' />
+  </head>
+  <docTitle>
+    <text>Unnamed</text>
+  </docTitle>
+  <navMap>
+    <navPoint id='navPoint-1' playOrder='1'>
+      <navLabel>
+        <text>Contents</text>
+      </navLabel>
+      <content src='eBookli1.xhtml#x2-1000'></content>
+    </navPoint>
+    <navPoint id='navPoint-2' playOrder='2'>
+      <navLabel>
+        <text>Preface</text>
+      </navLabel>
+      <content src='eBookli2.xhtml#x3-2000'></content>
+    </navPoint>
+    <navPoint id='navPoint-3' playOrder='3'>
+      <navLabel>
+        <text>Preface</text>
+      </navLabel>
+      <content src='eBookli2.xhtml#Q1-3-3'></content>
+    </navPoint>
+    <navPoint id='navPoint-4' playOrder='4'>
+      <navLabel>
+        <text>1 Introduction</text>
+      </navLabel>
+      <content src='eBookch1.xhtml#x4-30001'></content>
+      <navPoint id='navPoint-5' playOrder='5'>
+        <navLabel>
+          <text>1.1 Some Fiddling with LaTeX</text>
+        </navLabel>
+        <content src='eBookch1.xhtml#x4-40001.1'></content>
+      </navPoint>
+    </navPoint>
+    <navPoint id='navPoint-6' playOrder='6'>
+      <navLabel>
+        <text>2 Example Body</text>
+      </navLabel>
+      <content src='eBookch2.xhtml#x5-50002'></content>
+      <navPoint id='navPoint-7' playOrder='7'>
+        <navLabel>
+          <text>2.1 The First Section</text>
+        </navLabel>
+        <content src='eBookch2.xhtml#x5-60002.1'></content>
+        <navPoint id='navPoint-8' playOrder='8'>
+          <navLabel>
+            <text>An Unnumbered Section</text>
+          </navLabel>
+          <content src='eBookch2.xhtml#x5-7000'></content>
+        </navPoint>
+        <navPoint id='navPoint-9' playOrder='9'>
+          <navLabel>
+            <text>Another Unnumbered Section</text>
+          </navLabel>
+          <content src='eBookch2.xhtml#x5-8000'></content>
+        </navPoint>
+      </navPoint>
+    </navPoint>
+    <navPoint id='navPoint-10' playOrder='10'>
+      <navLabel>
+        <text>Notes by Chapter</text>
+      </navLabel>
+      <content src='eBookch2.xhtml#Q1-5-12'></content>
+      <navPoint id='navPoint-11' playOrder='11'>
+        <navLabel>
+          <text>Notes</text>
+        </navLabel>
+        <content src='eBookch2.xhtml#x5-9000'></content>
+      </navPoint>
+    </navPoint>
+    <navPoint id='navPoint-12' playOrder='12'>
+      <navLabel>
+        <text>The Index</text>
+      </navLabel>
+      <content src='eBookch2.xhtml#Q1-5-14'></content>
+    </navPoint>
+  </navMap>
+</ncx>

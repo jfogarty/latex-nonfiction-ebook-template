@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: LaTeX Nonfiction Book/eBook Template
+version: 2026.05.21
+date-released: 2026-05-21
+type: software
+license: MIT
+authors:
+  - given-names: Wilson J.
+    family-names: Schmeggles
+    affiliation: Your Press
+abstract: >-
+  A LaTeX template for technical nonfiction books with print PDF, EPUB3,
+  and web (lwarp) outputs from shared source files.
+keywords:
+  - LaTeX
+  - EPUB
+  - self-publishing
+  - KOMA-Script
+repository-code: https://github.com/robertoreale/latex-nonfiction-ebook-template
+message: >-
+  If you use this template, please cite it using the metadata from this file.

@@ -22,17 +22,17 @@
 \DeclareAcronym{ny}{
   short = NY ,
   long  = New York ,
-  class = abbrev
+  tag = abbrev
 }
 \DeclareAcronym{la}{
   short = LA ,
   long  = Los Angeles ,
-  class = abbrev
+  tag = abbrev
 }
 \DeclareAcronym{un}{
   short = UN ,
   long  = United Nations ,
-  class = abbrev
+  tag = abbrev
 }
 
 % class `nomencl': nomenclature
@@ -40,19 +40,19 @@
   short = \ensuremath{a} ,
   long  = The number of angels per unit area ,
   sort  = a ,
-  class = nomencl
+  tag = nomencl
 }
 \DeclareAcronym{numofangels}{
   short = \ensuremath{N} ,
   long  = The number of angels per needle point ,
   sort  = N ,
-  class = nomencl
+  tag = nomencl
 }
 \DeclareAcronym{areaofneedle}{
   short = \ensuremath{A} ,
   long  = The area of the needle point ,
   sort  = A ,
-  class = nomencl
+  tag = nomencl
 }
 
 \DeclareAcronym{B}{
@@ -60,49 +60,49 @@
   long         = {byte},
   short-plural = {},
   long-plural  = {},
-  class        = {non-SI-unit},
+  tag        = {non-SI-unit},
 }
 \DeclareAcronym{g}{
   short        = {g},
   long         = {gramm},
   short-plural = {},
   long-plural  = {},
-  class        = {SI-unit-derived},
+  tag        = {SI-unit-derived},
 }
 \DeclareAcronym{k}{
   short        = {k},
   long         = {kilo},
   short-plural = {},
   long-plural  = {},
-  class        = {SI-prefix},
+  tag        = {SI-prefix},
 }
 \DeclareAcronym{kB}{
   short        = {\acs{k}\acs{B}},
   long         = {\Acl{k}\acl{B}},
   short-plural = {},
   long-plural  = {},
-  class        = {non-SI-unit-derived},
+  tag        = {non-SI-unit-derived},
 }
 \DeclareAcronym{kg}{
   short        = {\acs{k}\acs{g}},
   long         = {\Acl{k}\acl{g}},
   short-plural = {},
   long-plural  = {},
-  class        = {SI-unit},
+  tag        = {SI-unit},
 }
 \DeclareAcronym{m}{
   short        = {m},
   long         = {milli},
   short-plural = {},
   long-plural  = {},
-  class        = {SI-prefix},
+  tag        = {SI-prefix},
 }
 \DeclareAcronym{mg}{
   short        = {\acs{m}\acs{g}},
   long         = {\Acl{m}\acl{g}},
   short-plural = {},
   long-plural  = {},
-  class        = {SI-unit-derived},
+  tag        = {SI-unit-derived},
 }
 
 \newcommand{\LA}{\ac{la}\xspace}
@@ -168,7 +168,7 @@
 	\DeclareAcronym{#2}{%
 	  short = \AiaFmt{#2} ,%
 	  long  = {#1} ,%
-	  class = aiabbrev%
+	  tag = aiabbrev%
 	}%
 	\AiAcronymNames{#2}%
 }
@@ -226,7 +226,7 @@
 	\DeclareAcronym{#2}{%
 	  short = \NsaFmt{#2},%
 	  long  = {[#3] #4},%
-	  class = nsabbrev%
+	  tag = nsabbrev%
 	}}%
     \IfBooleanF{#1}{\NsTermNames{#2}{#3}}%
 }
@@ -281,13 +281,13 @@ interface between the brain's motor and non-motor (cognitive and limbic) circuit
   \RunningHeads{Abbreviations and Terms}
   \printacronyms[name=All Abbreviations and Terms]
 
-  \printacronyms[include-classes=nomencl,name=Nomenclature]
+  \printacronyms[include={nomencl},name=Nomenclature]
 
   \RightRunningHeads{Abbreviations (Computation)}
-  \printacronyms[include-classes=aiabbrev,name=Abbreviations (Computation)]
+  \printacronyms[include={aiabbrev},name=Abbreviations (Computation)]
   
   \RightRunningHeads{Abbreviations (Neuroscience)}
-  \printacronyms[include-classes=nsabbrev,name=Abbreviations (Neuroscience)]
+  \printacronyms[include={nsabbrev},name=Abbreviations (Neuroscience)]
 }
 
 %%---------------------------------------------------------------------

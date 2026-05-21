@@ -1,97 +1,91 @@
 #########################
-#### GENERAL or ROOT ####
+#### LaTeX artifacts ####
 #########################
-
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.ent
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
 *.log
-*.old
+*.los
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xbb
+*.4ct
+*.4tc
+*.idv
+*.lg
 *.tmp
-rebuild.bash
+*.xref
+*.ain
+*.ent
+*.jf.txt
+*.old
+book.txss
 
-# Transifex
-.transifexrc
+#########################
+#### Build outputs   ####
+#########################
+/build/
+book.pdf
+eBook.pdf
+eBook.epub
+*.html
+!eBookEntry.html
+!web/dist/
 
-# Maven
-target/
-
-# Eclipse
-.classpath
-.project
-.settings/
-*.iml
-*.pyc
-.DS_Store
-*.orig
-pre-commit-changes.txt
-
-# Emacs temp files
-~*
-*~
-
-#SVN
-.svn
-*.svn-base
-*#
-
-.idea
-.AppleDouble/
-
-# OS Files
+#########################
+#### OS / editor     ####
+#########################
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-Icon?
-ehthumbs.db
 Thumbs.db
-
-#vim files
+ehthumbs.db
+Icon?
+*~
+~*
 .*.sw?
 .*~
+.idea/
+.AppleDouble/
+*.orig
+*.iml
 
-#Johns local files and dirs
+#########################
+#### Local / legacy  ####
+#########################
 all_*/
 final_*/
 images_unused/
 cover\ images/
 tex-old/
 xxx/
-
-bin/toBookFormat\ (copy)
-
+pre-commit-changes.txt
 Formatting\ TODOs.txt
 Additional\ Bibliography.bib
 Bibliography.bib
 outline.tex
-
-book.txss
-
 cover/ISBN.*
 cover/FrontCoverOldClunky.tex
-
 diagrams/JF*
+bin/toBookFormat\ (copy)
 
-*.ain
-*.aux
-*.bash
-*.bbl
-*.blg
-*.ent
-*.html
-*.idx
-*.ilg
-*.ind
-*.lof
-*.los
-*.log
-*.out
-*.pdf
-*.PDF
-*.synctex.gz
-*.toc
-*.xbb
-*.zip
-*.jf.txt
-rebuild.bash
+# SDLC artifacts (local validation; not committed)
+/test-results/
+/artifacts/
+/state.md
 
-!eBookEntry.html
+# Keep plan local
+.cursor/
