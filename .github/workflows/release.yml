@@ -26,7 +26,7 @@ jobs:
           cat ../checksums.sha256
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             build/print/book.pdf
