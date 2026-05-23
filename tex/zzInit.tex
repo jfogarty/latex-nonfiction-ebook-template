@@ -19,25 +19,69 @@
 \usepackage{makeidx}          % Enable Index creation
 \usepackage[tight]{shorttoc}            % Allow an abbreviated table of contents
 \usepackage{tocloft}                    % Control TOC and create new lists
+\usepackage{booktabs}                   % Modern table rules
 
-% Note BIBLATEX *cannot* be enabled with these packages.
-%\usepackage[backend=biber]{biblatex}   % Use the BIBER citation generator
-%\usepackage[backref=true]{biblatex}    % Bibliography with back hyperlink.
-
-\ifthenelse{\boolean{NOAUTHORS}}{}{
-  \usepackage[biblabels]{authorindex}   % Enable Authors Cite list creation
-}
 \usepackage{multicol}                   % Multiple columns for the index
 \usepackage{blindtext}                  % Nonsense text fillers
 \usepackage{ifxetex,ifluatex}           % processor conditionals
 \usepackage{wrapfig}                    % Support wrapfigure environment
-\usepackage{endnotes}                   % Support endnotes.
+\ifthenelse{\boolean{TOHTML}}{%
+  \usepackage{endnotes}                 % tex4ht-compatible endnotes for EPUB
+  \newcommand{\printendnotes}{\theendnotes}%
+  \newcommand{\SetupBookEndnotes}{%
+    \AtBeginDocument{\let\footnote=\endnote}%
+  }%
+}{%
+  \usepackage{enotez}                   % Modern endnotes for print/web
+  \ifthenelse{\boolean{TOHTML}}{%
+    \setenotez{backref=false,list-name={Notes by Chapter}}%
+  }{%
+    \setenotez{backref=true,list-name={Notes by Chapter}}%
+  }%
+  \AtBeginDocument{%
+    \let\footnote=\endnote
+    \let\footnotemark=\endnotemark
+    \let\footnotetext=\endnotetext
+  }%
+  \newcommand{\SetupBookEndnotes}{}%
+}%
 \usepackage{titling}                    % fancy titles with prefix and suffix
 
-\usepackage[T1]{fontenc}        % enables special graphics
-\usepackage{textcomp}           % LaTex fonts and glyph encodings such as \textonehalf
-\usepackage{lmodern}            % LaTex modern math
-\usepackage[utf8]{inputenc}             % allows limited support for non-ascii UTF8 codes in text
+% Engine-specific font setup (HTML/EPUB uses pdfLaTeX-compatible fonts)
+\ifluatex
+  \ifthenelse{\boolean{USELUATEX}\AND\not\boolean{TOHTML}}{%
+    \usepackage{fontspec}
+    \IfFontExistsTF{Libertinus Serif}{%
+      \setmainfont{Libertinus Serif}[
+        BoldFont = Libertinus Serif Bold,
+        ItalicFont = Libertinus Serif Italic,
+        BoldItalicFont = Libertinus Serif Bold Italic
+      ]
+      \setsansfont{Libertinus Sans}
+      \setmonofont{Libertinus Mono}
+    }{%
+      \setmainfont{Latin Modern Roman}
+      \setsansfont{Latin Modern Sans}
+      \setmonofont{Latin Modern Mono}
+    }
+  }{%
+    \usepackage[T1]{fontenc}
+    \usepackage{textcomp}
+    \usepackage{lmodern}
+    \usepackage[utf8]{inputenc}
+  }{}
+\else
+  \ifthenelse{\boolean{USELUATEX}}{%
+    \PackageWarning{zzInit}{USELUATEX true but not LuaLaTeX; using pdfLaTeX fonts}
+  }{}
+  \usepackage[T1]{fontenc}
+  \usepackage{textcomp}
+  \usepackage{lmodern}
+  \usepackage{latexsym}
+  \usepackage{wasysym}
+  \usepackage[utf8]{inputenc}
+\fi
+
 \usepackage{graphicx}                   % graphics driver support (math/images for PDFs)
 
 \usepackage[english]{babel}             % Support for non-english typesetting
@@ -52,14 +96,53 @@
   \usepackage{subcaption}               % subcaptions in figures]
 }{}
 
-% Math and Software 
-%\usepackage{amsmath}             % American math (cannot use with wasysym)
-\usepackage{mathtools}
-\usepackage{wasysym}              % Additional symbols
+% Math and Software (skip amsmath for tex4ht — LaTeX 2024 kernel defines \iint)
+\ifthenelse{\boolean{TOHTML}}{%
+  \RequirePackage{amstext}% minimal AMS text support for tex4ht
+}{%
+  \usepackage{mathtools}
+}
+\usepackage{wasysym}              % Additional symbols (used in preface.tex)
+\ifluatex
+  \ifthenelse{\boolean{USELUATEX}}{}{%
+    \usepackage{latexsym}
+  }{}
+\else
+  \usepackage{latexsym}
+\fi
 \usepackage{amssymb}              % American math symbols
-\usepackage{latexsym}             % LaTex symbols
 \usepackage{amsfonts} % experimental
 \usepackage{bm}       % math bold - experimental
+
+% biblatex + biber (after amsmath; replaces BibTeX + authorindex)
+\ifthenelse{\boolean{TOHTML}}{%
+  \usepackage[backend=biber,style=ext-numeric-comp,backref=false,url=true,doi=true,isbn=true,hyperref=auto]{biblatex}
+}{%
+  \usepackage[backend=biber,style=ext-numeric-comp,backref=true,url=true,doi=true,isbn=true,hyperref=auto]{biblatex}
+}
+\addbibresource{tex/bib/book.bib}
+
+% Author-only bibliography environment for "Authors Cited"
+\defbibenvironment{authorname}{%
+  \list{}{%
+    \setlength{\leftmargin}{0pt}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\parsep}{0pt}%
+  }}{%
+  \endlist}{%
+  \item\ignorespaces
+}
+\newcommand{\EmitPrintAuthorIndex}{%
+  \printbibliography[env=authorname,heading=none,title={Authors Cited}]%
+}
+
+\ifthenelse{\boolean{USESIUNITX}}{%
+  \usepackage{siunitx}
+}{}
+
+\usepackage{tcolorbox}
+\tcbset{colback=gray!5,colframe=gray!50,boxrule=0.5pt,arc=2pt}
+\newtcolorbox{sidebar}{colback=blue!5!white,colframe=blue!50!black,title=Sidebar}
 
 %\usepackage{fontspec}    % -- Use with XeLaTex only for OpenType fonts
 %\usepackage{lilyglyphs}  % -- Use with XeLaTex only, Musical notations
@@ -70,9 +153,7 @@
 
 %\usepackage[nottoc]{tocbibind}         % Place the References, Index in TOC
 %\usepackage[makeindex]{imakeidx}        % Make index hyperref to body
-% Urls and Hrefs that work in PDFs [should be last] package.
-\usepackage[hyphens]{url}  
-
+\PassOptionsToPackage{hyphens}{url}
 \ifthenelse{\boolean{NOHYPERREF}}{
   \newcommand\hypersetup[1]{}%
   \newcommand{\href}[2]{Href=#1}%
@@ -88,6 +169,23 @@
             pdfkeywords={\TheKeywords},
             plainpages=false]{hyperref}
   }
+}
+
+% microtype, bookmark, cleveref, hyperxmp (after hyperref)
+\ifthenelse{\boolean{TOHTML}}{}{%
+  \usepackage{microtype}
+}
+\usepackage{bookmark}
+\hypersetup{%
+  pdfusetitle,%
+  pdfdisplaydoctitle=true,%
+  bookmarksnumbered=true,%
+  bookmarksopen=true,%
+  pdflang=en-US%
+}
+\usepackage{cleveref}
+\ifthenelse{\boolean{TOHTML}}{}{%
+  \usepackage{hyperxmp}
 }
 
 \usepackage{xstring}                    % String manipulation macros
@@ -209,31 +307,55 @@
 
 %%---------------------------------------------------------------------
 %% Cited Authors list generation is optional.
-\newcommand{\EmitPrintAuthorIndex}{
-  \ifthenelse{\boolean{ONECOLUMN}}{%
-    \printauthorindex%
-  }{%
-    \begin{multicols}{2}%
-      \printauthorindex%
-    \end{multicols}%
-  }%
-}
-
-\newcommand{\PrintAuthorIndex}{
+\newcommand{\PrintAuthorIndex}{%
   \ifthenelse{\boolean{NOAUTHORS}}{}{%
     \ifthenelse{\boolean{TOHTML}}{%
-      \renewcommand\indexspace{
-    }%
-  }{}%
+      \renewcommand\indexspace{}%
+    }{}%
     \cleardoublepage\phantomsection%
     \RunningHeads{Authors Cited}
     \chapter*{Authors Cited}%
     \addcontentsline{toc}{chapter}{Authors Cited}%
-    \EmitPrintAuthorIndex
+    \ifthenelse{\boolean{ONECOLUMN}}{%
+      \EmitPrintAuthorIndex
+    }{%
+      \begin{multicols}{2}%
+        \EmitPrintAuthorIndex
+      \end{multicols}%
+    }%
   }%
 }%
 
-%---------------------------------------------------------------------
+% Summary TOC macro (KOMA/tocbasic style)
+\newcommand{\summaryTOC}{%
+  \chapter*{Summary Contents}%
+  \begingroup
+    \setcounter{tocdepth}{0}%
+    \tableofcontents
+  \endgroup
+}
+
+% Defines the heading text for a chapter's notes.
+\newcommand{\ChapterNotesName}[1]{%
+  \ifthenelse{\boolean{CHAPTERNOTES}}{%
+    \renewcommand{\notesname}{Notes [#1]}%
+  }{%
+    \def\CurrentChapterNoteTitle{#1}%
+  }%    
+}
+
+% After each chapter reset the note numbering and output the 
+% accumulated chapter notes if requested.
+\newcommand{\ChapterSuffix}{%
+  \ifdefined\IsOutline\else
+    \ifthenelse{\boolean{CHAPTERNOTES}}{%
+      \printendnotes
+      \setcounter{endnote}{0}%
+    }{%
+      \setcounter{endnote}{0}%
+    }%
+  \fi%
+}
 % Add Index[optional index text]{permuted section name}{index text}
 \newcommand{\CatIndex}[2]{\Index{#1!\textsf{#2}}}
 
@@ -271,34 +393,6 @@
 \newcommand{\ParagraphSkip}{\parskip 0pt}
 
 %%---------------------------------------------------------------------
-% Defines the heading text for a chapter's notes.
-\newcommand{\ChapterNotesName}[1]{%
-  \ifthenelse{\boolean{CHAPTERNOTES}}{%
-    \renewcommand{\notesname}{Notes [#1]}%
-  }{%
-    \addtoendnotes{
-      \bigskip\StopIndent
-      \large\textsf{Chapter \thechapter\, --- #1}
-      \normalsize\normalfont\bigskip
-    }
-  }%    
-}
-
-%%---------------------------------------------------------------------
-% After each chapter reset the note numbering and output the 
-% accumulated chapter notes if requested.
-\newcommand{\ChapterSuffix}{%
-  \ifdefined\IsOutline\else
-    \ifthenelse{\boolean{CHAPTERNOTES}}{%
-      \theendnotes%
-      \setcounter{endnote}{0}%
-    }{
-      \setcounter{endnote}{0}%
-    }%
-  \fi%
-}
-
-%%---------------------------------------------------------------------
 \newcommand{\ChapterPrefix}{%
   \ifdefined\IsOutline\else%
     \ChapterSuffix%
@@ -325,7 +419,7 @@
   \ifthenelse{\boolean{CHAPTERNOTES}}{}{%
     \cleardoublepage\phantomsection%
     \addcontentsline{toc}{chapter}{Notes by Chapter}%
-    \theendnotes%
+    \printendnotes
   }%
 }
 
@@ -466,14 +560,24 @@
 %  \FigureCentered[label]{width}{caption}{imagefilenamebase}
 \newcommand{\FigureCentered}[4][]{%
   \begin{figure}[ht]%
-    \begin{center}%
+    \ifthenelse{\boolean{TOHTML}}{%
+      \centering
       \ifthenelse{\isempty{#2}}%
         {\Image[width=0.75\textwidth]{#4}}%
         {\Image[width=#2\textwidth]{#4}}%
-          \ifthenelse{\isempty{#3}}{}{\caption{#3}}%
-          \ifthenelse{\isempty{#1}}{}{\label{fig:#1}}%
-          \iFigureSource%
-    \end{center}%
+      \ifthenelse{\isempty{#3}}{}{\caption{#3}}%
+      \ifthenelse{\isempty{#1}}{}{\label{fig:#1}}%
+      \iFigureSource%
+    }{%
+      \begin{center}%
+        \ifthenelse{\isempty{#2}}%
+          {\Image[width=0.75\textwidth]{#4}}%
+          {\Image[width=#2\textwidth]{#4}}%
+            \ifthenelse{\isempty{#3}}{}{\caption{#3}}%
+            \ifthenelse{\isempty{#1}}{}{\label{fig:#1}}%
+            \iFigureSource%
+      \end{center}%
+    }%
   \end{figure}%
 }
 

@@ -1,0 +1,27 @@
+name: Lint
+
+on:
+  push:
+    branches: [master, main, modernize/2026]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: YAML lint
+        run: |
+          pip install yamllint
+          yamllint .github/ docker-compose.yml web/_config.yml .yamllint.yaml
+
+      - name: Markdown lint
+        run: |
+          npm install -g markdownlint-cli
+          markdownlint README.md CONTRIBUTING.md CHANGELOG.md docs/*.md || true
+
+      - name: Codespell
+        run: |
+          pip install codespell
+          codespell -L TeX,te,nd,ser,ans README.md book.tex eBook.tex || true

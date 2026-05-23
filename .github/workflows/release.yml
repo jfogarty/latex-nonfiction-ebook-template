@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build all formats
+        run: |
+          docker build -t latex-book-template .
+          docker compose run --rm book just all
+          docker compose run --rm book ./bin/epubcheck build/ebook/eBook.epub
+
+      - name: Generate checksums
+        run: |
+          cd build
+          sha256sum print/book.pdf ebook/eBook.epub > ../checksums.sha256
+          cat ../checksums.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/print/book.pdf
+            build/ebook/eBook.epub
+            checksums.sha256

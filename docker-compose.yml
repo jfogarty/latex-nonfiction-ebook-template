@@ -1,0 +1,8 @@
+services:
+  book:
+    build: .
+    image: latex-nonfiction-ebook-template:latest
+    volumes:
+      - .:/book
+    working_dir: /book
+    command: ["just", "all"]

@@ -1,0 +1,12 @@
+%% tex/zzWeb.tex — lwarp web-specific overrides (2026 template)
+\providecommand{\WebMeta}{%
+  \LWRhtmlmeta{viewport}{width=device-width, initial-scale=1}%
+}
+
+\AtBeginDocument{\WebMeta}
+
+\WarpCSS{web-overrides}{
+  body { max-width: 45em; margin: 0 auto; padding: 1em; line-height: 1.6; font-family: Georgia, serif; }
+  nav { margin: 1em 0; padding: 1em; background: #f5f5f5; border-radius: 4px; }
+  a { color: #0066cc; }
+}

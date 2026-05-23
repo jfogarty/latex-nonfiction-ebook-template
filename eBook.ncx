@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">                  <head> 
+<meta name="dtb:uid" content="92cb3522-cf8b-4358-c066-6aee78b2bdd4"/> 
+<meta name="dtb:depth" content="3"/> 
+<meta name="dtb:totalPageCount" content="0"/> 
+<meta name="dtb:maxPageNumber" content="0"/> 
+</head> 
+<docTitle> 
+<text>Unnamed</text> 
+</docTitle> 
+<navMap> 
+<navPoint id="navPoint-1" playOrder="1"> 
+<navLabel> 
+<text><navmark type="likechapter"></navmark> Contents</text> 
+</navLabel> 
+<content src="eBookli1.xhtml#x2-1000" /></navPoint> 
+ 
+<navPoint id="navPoint-2" playOrder="2"> 
+<navLabel> 
+<text><navmark type="likechapter"></navmark> Preface</text> 
+</navLabel> 
+<content src="eBookli2.xhtml#x3-2000" /></navPoint> 
+ 
+<navPoint id="navPoint-3" playOrder="3"> 
+<navLabel> 
+<text><navmark type="chapter"></navmark>
+Preface</text> 
+</navLabel> 
+<content src="eBookli2.xhtml#Q1-3-3" /></navPoint> 
+ 
+<navPoint id="navPoint-4" playOrder="4"> 
+<navLabel> 
+<text><navmark type="chapter">1</navmark> Introduction</text> 
+</navLabel> 
+<content src="eBookch1.xhtml#x4-30001" /> 
+<navPoint id="navPoint-5" playOrder="5"> 
+<navLabel> 
+<text><navmark type="section">1.1</navmark> Some Fiddling
+with LaTeX</text> 
+</navLabel> 
+<content src="eBookch1.xhtml#x4-40001.1" /></navPoint> 
+</navPoint> 
+ 
+<navPoint id="navPoint-6" playOrder="6"> 
+<navLabel> 
+<text><navmark type="chapter">2</navmark> Example Body</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#x5-50002" /> 
+<navPoint id="navPoint-7" playOrder="7"> 
+<navLabel> 
+<text><navmark type="section">2.1</navmark> The
+First Section</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#x5-60002.1" /> 
+<navPoint id="navPoint-8" playOrder="8"> 
+<navLabel> 
+<text><navmark type="likesubsection"></navmark> An Unnumbered Section</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#x5-7000" /></navPoint> 
+ 
+<navPoint id="navPoint-9" playOrder="9"> 
+<navLabel> 
+<text><navmark type="likesubsection"></navmark>
+Another Unnumbered Section</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#x5-8000" /></navPoint> 
+</navPoint> 
+</navPoint> 
+ 
+<navPoint id="navPoint-10" playOrder="10"> 
+<navLabel> 
+<text><navmark type="chapter"></navmark> Notes
+by Chapter</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#Q1-5-12" /> 
+<navPoint id="navPoint-11" playOrder="11"> 
+<navLabel> 
+<text><navmark type="likesection"></navmark> Notes</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#x5-9000" /></navPoint> 
+</navPoint> 
+ 
+<navPoint id="navPoint-12" playOrder="12"> 
+<navLabel> 
+<text><navmark type="chapter"></navmark> The Index</text> 
+</navLabel> 
+<content src="eBookch2.xhtml#Q1-5-14" />
+</navPoint> 
+</navMap>
+</ncx>
